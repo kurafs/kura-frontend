@@ -1,6 +1,7 @@
 import React from 'react'
 import './Login.css'
 import login from './LoginManager'
+import App from './App'
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -34,25 +35,29 @@ class Login extends React.Component {
     login(this.state.username, this.state.password, (resp) => {this.setState({key: resp.key})});
   };
   render() {
-    return (
-      <div className="Login">
-        <header>
-          Welcome to KuraFS
-        </header>
-        <p>
-          Please log in to continue:
-        </p>
-        <div>
-          <div>
-            username: <input id="0" onChange={this.onInput}/>
-          </div>
-          <div className="pass">
-            password: <input type="password" id="1" onChange={this.onInput} onKeyDown={this.onKeyPress}/>
-          </div>
-          <button onClick={this.onSubmit}>Login</button>
-        </div>
-      </div>
-    );
+    // if (this.state.key) {
+      return <App key={this.state.key} />
+    // } else {
+    //   return (
+    //     <div className="Login">
+    //       <header>
+    //         Welcome to KuraFS
+    //       </header>
+    //       <p>
+    //         Please log in to continue:
+    //       </p>
+    //       <div>
+    //         <div>
+    //           username: <input id="0" onChange={this.onInput}/>
+    //         </div>
+    //         <div className="pass">
+    //           password: <input type="password" id="1" onChange={this.onInput} onKeyDown={this.onKeyPress}/>
+    //         </div>
+    //         <button onClick={this.onSubmit}>Login</button>
+    //       </div>
+    //     </div>
+    //   );
+    // }
   }
 }
 

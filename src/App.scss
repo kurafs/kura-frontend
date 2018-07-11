@@ -1,0 +1,90 @@
+.app {
+    display: flex;
+    height: 100vh;
+    text-align: center;
+    font-family: Helvetica;
+}
+
+.sidebar {
+    width: 25%;
+    height: 100%;
+    border-right: solid black;
+    border-width: 0 1px 0 0;
+    overflow: hidden;
+    .separator {
+        border-bottom: solid black;
+        border-width: 0 0 1px 0;
+        padding-top: 5vh;
+        width: 100%;
+    }
+
+    .block {
+        padding: 3vh 0 3vh 0;
+        border-bottom: solid black;
+        border-width: 0 0 1px 0;
+    }
+}
+
+.content {
+    width: 75%;
+    height: 100%;
+    overflow: hidden;
+    .header {
+        .title {
+            display: flex;
+            border-bottom: solid black;
+            border-width: 0 0 1px 0;
+            h1 {
+                width: 75%;
+            }
+            div {
+                margin: auto;
+                display: block;
+                width: 25%;
+            }
+
+        }
+        .subtitle {
+            display: flex;
+            padding: 1.1vh 0  1.1vh 0;
+            border-bottom: solid black;
+            border-width: 0 0 1px 0;
+            .name {
+                padding-left: 17vh;
+            }
+            .size {
+                padding-left: 22vh;
+            }
+            .modified {
+                padding-left: 10vh;
+            }
+        }
+    }
+    .body {
+        overflow: auto;
+        height: 100vh;
+        .block {
+            display: flex;
+            padding: 3vh 0 3vh 0;
+            border-bottom: solid black;
+            border-width: 0 0 1px 0;
+            .icon {
+                width: 10%;
+                height: 100%;
+                content:url('assets/default_img.png');
+            }
+            .name {
+                width: 30%;
+            }
+            .size {
+                width: 35%;
+            }
+            .menu {
+                width: 15%;
+            }
+            .download {
+                width: 10%;
+            }
+        }
+    }
+}
