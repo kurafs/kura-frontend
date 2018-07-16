@@ -1,2 +1,3 @@
 Frontend for Kura
-TODO
+
+To run, simply clone, run `npm install` and then `npm start`
