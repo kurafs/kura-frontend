@@ -1,8 +1,9 @@
 .app {
     display: flex;
+    overflow-y: hidden;
     height: 100vh;
     text-align: center;
-    font-family: Helvetica;
+    font-family: Helvetica, serif;
 }
 
 .sidebar {
@@ -35,12 +36,15 @@
             border-bottom: solid black;
             border-width: 0 0 1px 0;
             h1 {
-                width: 75%;
+                width: 70%;
             }
             div {
-                margin: auto;
-                display: block;
-                width: 25%;
+                width: 15%;
+                height: 1em;
+                padding: 2vh 0 2vh 0;
+                border: 1px solid black;
+                margin-left: 2vw;
+                margin-right: 2vw;
             }
 
         }
@@ -50,41 +54,77 @@
             border-bottom: solid black;
             border-width: 0 0 1px 0;
             .name {
-                padding-left: 17vh;
+                padding-left: 5vw;
+                width: 27vw;
             }
             .size {
-                padding-left: 22vh;
+                width: 8vw;
             }
             .modified {
-                padding-left: 10vh;
+                width: 28vw;
             }
         }
     }
     .body {
         overflow: auto;
-        height: 100vh;
+        height: 83vh;
         .block {
             display: flex;
-            padding: 3vh 0 3vh 0;
+            padding: 1vh 0 1vh 0;
             border-bottom: solid black;
-            border-width: 0 0 1px 0;
+            border-right: solid black;
+            border-width: 0 1px 1px 0;
+            text-align: center;
             .icon {
-                width: 10%;
-                height: 100%;
-                content:url('assets/default_img.png');
+                width: 10vh;
+                height: 10vh;
+                content: url('assets/default_img.png');
             }
             .name {
-                width: 30%;
+                text-align: left;
+                padding-left: 7vw;
+                width: 27vw;
             }
             .size {
-                width: 35%;
+                width: 8vw;
+            }
+            .modified {
+                width: 28vw;
             }
             .menu {
-                width: 15%;
+                padding-left: 7vw;
+                text-align: center;
+                img {
+                    width: 5vw;
+                    height: 1.1vw;
+                    padding-top: 3vh;
+                    padding-bottom: 1vh;
+                }
+                .popup {
+                    border-top: 1px solid black;
+                    border-right: 1px solid black;
+                    border-left: 1px solid black;
+                    position: fixed;
+                    div {
+                        padding: 1vh;
+                        border-bottom: 1px solid black;
+                        background: white;
+                    }
+                    :hover {
+                        background: lightgray;
+                    }
+                }
+                .invisible {
+                    display: none;
+                }
+
             }
             .download {
-                width: 10%;
+                padding-left: 6vw;
             }
+        }
+        .hover:hover {
+            background: lightgray;
         }
     }
 }

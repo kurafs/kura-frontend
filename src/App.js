@@ -1,12 +1,15 @@
 import React from 'react'
 import './App.css'
 import _ from 'lodash'
+import menu from './assets/menu.png'
+import $ from 'jquery'
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       directory: this.getStructure(),
-      root: ''
+      root: '',
+      selectedMenu: ''
     }
   }
 
@@ -15,18 +18,21 @@ class App extends React.Component {
       "folder1": {
         "file1": {
           "metadata": {
-            "size": 100
+            "size": 100,
+            "modified": "January 31 2019"
           }
         },
         "file2": {
           "metadata": {
-            "size": 1024
+            "size": 1024,
+            "modified": "January 31 2019"
           }
         },
         "more": {
           "file3": {
             "metadata": {
-              "size": 37899
+              "size": 37899,
+              "modified": "January 31 2019"
             }
           }
         }
@@ -35,34 +41,52 @@ class App extends React.Component {
         "stuff": {
           "file": {
             "metadata": {
-              "size": 100
+              "size": 100,
+              "modified": "January 31 2019"
             }
           }
         }
       },
       "cool file": {
         "metadata": {
-          "size": 50
+          "size": 999,
+          "modified": "January 31 2019"
         }
       },
       "cool file2": {
         "metadata": {
-          "size": 50
+          "size": 50,
+          "modified": "January 31 2019"
         }
       },
       "cool file3": {
         "metadata": {
-          "size": 50
+          "size": 50,
+          "modified": "January 31 2019"
         }
       },
       "cool file4": {
         "metadata": {
-          "size": 50
+          "size": 50,
+          "modified": "January 31 2019"
         }
       },
       "cool file5": {
         "metadata": {
-          "size": 50
+          "size": 50,
+          "modified": "January 31 2019"
+        }
+      },
+      "cool file6": {
+        "metadata": {
+          "size": 50,
+          "modified": "January 31 2019"
+        }
+      },
+      "cool file7": {
+        "metadata": {
+          "size": 50,
+          "modified": "January 31 2019"
         }
       },
       "favourites": [
@@ -72,11 +96,25 @@ class App extends React.Component {
     }
   };
 
+  goBack = () => {
+    if ((this.state.root.match(/\//g) || []).length === 0) {
+      this.setState({root: ''});
+    } else {
+      this.setState({root: this.state.root.substring(0, this.state.root.lastIndexOf('/'))})
+    }
+  };
+
   content = () => {
     return (<div>
       <div className="header">
         <div className="title">
+          { this.state.root === "" ? '':
+            <div onClick={this.goBack}>
+              Back
+            </div>
+          }
           <h1>
+            {console.log(this.state.root)}
             {this.state.root === "" ? "Root": _.last(this.state.root.split('/')) }
           </h1>
           <div>
@@ -102,8 +140,18 @@ class App extends React.Component {
     </div>);
   };
 
-  folderClick = (e) => {
-    console.log(e);
+  folderClick = (obj) => {
+    if (this.state.root === "") {
+      this.setState({root: obj});
+    } else {
+      this.setState({root: this.state.root + "/" + obj});
+    }
+  };
+
+  menu = (e, obj) => {
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+    this.setState({selectedMenu: obj})
   };
 
   files = () => {
@@ -115,22 +163,41 @@ class App extends React.Component {
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
       let isFile = 'metadata' in rootObject[obj];
-      return <div onClick={isFile ? ()=>{} : this.folderClick} className="block" key={obj}>
+      return <div
+          onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
+          className={`block ${isFile ? "" : " hover"}`}
+          key={obj}
+          id={obj}>
         <div className="icon" />
         <div className="name">
           {obj}
         </div>
         <div className="size">
-          {isFile ? `${rootObject[obj].metadata.size} kb` : "???"}
+          {isFile ? `${rootObject[obj].metadata.size} kb` : ""}
+        </div>
+        <div className="modified">
+          {isFile ? `${rootObject[obj].metadata.modified}` : ""}
         </div>
         <div className="menu">
-          TODO MENU
+          <img onClick={(e) => {this.menu(e, obj)}} src={menu} />
+          <div className={`popup ${obj === this.state.selectedMenu ? "" : "invisible"}`}>
+            {this.popupMenuOptions()}
+          </div>
         </div>
         <div className="download">
           TODO DL ICON
         </div>
       </div>
     })
+  };
+
+  popupMenuOptions = () => {
+    let options = ["rename", "copy", "cut", "delete", "sharing"];
+    return options.map((option) => {
+      return <div>
+        {option}
+      </div>;
+    });
   };
 
   favourites = () => {
@@ -159,6 +226,7 @@ class App extends React.Component {
       </div>
     </div>);
   }
+
 }
 
 export default App;
