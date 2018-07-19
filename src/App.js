@@ -2,98 +2,93 @@ import React from 'react'
 import './App.css'
 import _ from 'lodash'
 import menu from './assets/menu.png'
-import $ from 'jquery'
+import {grpc} from 'grpc-web-client'
+import {MetadataService} from './proto/metadata_pb_service'
+import {PutFileRequest} from './proto/metadata_pb'
+import {GetDirectoryKeysRequest} from './proto/metadata_pb'
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.getStructure();
     this.state = {
-      directory: this.getStructure(),
+      directory: {},
       root: '',
       selectedMenu: ''
     }
   }
 
-  getStructure = () => {
-    return {
-      "folder1": {
-        "file1": {
-          "metadata": {
-            "size": 100,
-            "modified": "January 31 2019"
-          }
-        },
-        "file2": {
-          "metadata": {
-            "size": 1024,
-            "modified": "January 31 2019"
-          }
-        },
-        "more": {
-          "file3": {
-            "metadata": {
-              "size": 37899,
-              "modified": "January 31 2019"
+  uploadFile = (file) => {
+    let reader = new FileReader();
+    let array;
+    reader.readAsArrayBuffer(file);
+    let react = this;
+    reader.onloadend = function (evt) {
+      if (evt.target.readyState === FileReader.DONE) {
+        let arrayBuffer = evt.target.result;
+        array = new Uint8Array(arrayBuffer);
+        const putRequest = new PutFileRequest();
+        let fileName = react.state.root === '' ? file.name : root + file.name;
+        putRequest.setFile(array);
+        putRequest.setKey(fileName);
+        grpc.unary(MetadataService.PutFile, {
+          request: putRequest,
+          host: "http://localhost:10671",
+          onEnd: res => {
+            const { status, message} = res;
+
+            if (status === grpc.Code.OK && message) {
+              react.updateStructure(react, fileName);
             }
-          }
+          }});
+      }
+
+    };
+  };
+
+  parseStructure = (fileList) => {
+    let struct = {};
+    for(let i = 0; i < fileList.length; i++) {
+      let path = fileList[i].split('/');
+      let current = struct;
+      for (let j = 0; j < path.length; j++) {
+        if(path[j] === '') {
+          break;
         }
-      },
-      "folder2": {
-        "stuff": {
-          "file": {
-            "metadata": {
-              "size": 100,
-              "modified": "January 31 2019"
-            }
-          }
+        if(!_.has(current, path[j])) {
+          current[path[j]] = {};
         }
-      },
-      "cool file": {
-        "metadata": {
-          "size": 999,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file2": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file3": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file4": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file5": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file6": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "cool file7": {
-        "metadata": {
-          "size": 50,
-          "modified": "January 31 2019"
-        }
-      },
-      "favourites": [
-        "folder1/more",
-        "folder2/stuff"
-      ]
+        current = current[path[j]];
+      }
     }
+    return struct;
+  };
+
+  updateStructure = (react, file) => {
+    let directory = { ...react.state.directory}
+    let current = directory
+    let path = file.split('/');
+    for(let i = 0; i < path.length; i++) {
+      if(!_.has(current, path[i])) {
+        current[path[i]] = {};
+      }
+      current = current[path[i]];
+    }
+    react.setState({directory})
+  };
+
+  getStructure = () => {
+    const directoryKeys = new GetDirectoryKeysRequest();
+    grpc.unary(MetadataService.GetDirectoryKeys, {
+      request: directoryKeys,
+      host: "http://localhost:10671",
+      onEnd: res => {
+        const { status, message} = res;
+
+        if (status === grpc.Code.OK && message) {
+          this.setState({directory: this.parseStructure(message.toObject().keysList)});
+        }
+      }
+    });
   };
 
   goBack = () => {
@@ -102,6 +97,11 @@ class App extends React.Component {
     } else {
       this.setState({root: this.state.root.substring(0, this.state.root.lastIndexOf('/'))})
     }
+  };
+
+  handleFiles = (files) => {
+    let file = files.target.files[0];
+    this.uploadFile(file);
   };
 
   content = () => {
@@ -114,13 +114,12 @@ class App extends React.Component {
             </div>
           }
           <h1>
-            {console.log(this.state.root)}
             {this.state.root === "" ? "Root": _.last(this.state.root.split('/')) }
           </h1>
-          <div>
+          <label>
             Upload
-            <img src="" />
-          </div>
+            <input type="file" onChange={(files) => this.handleFiles(files)}/>
+          </label>
         </div>
         <div className="subtitle">
           <div className="name">
@@ -151,7 +150,7 @@ class App extends React.Component {
   menu = (e, obj) => {
     e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
-    this.setState({selectedMenu: obj})
+    this.setState({selectedMenu: this.state.selectedMenu === obj ? '': obj })
   };
 
   files = () => {
@@ -162,7 +161,7 @@ class App extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let isFile = 'metadata' in rootObject[obj];
+      let isFile = Object.keys(rootObject[obj]).length === 0;
       return <div
           onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
           className={`block ${isFile ? "" : " hover"}`}
@@ -173,13 +172,13 @@ class App extends React.Component {
           {obj}
         </div>
         <div className="size">
-          {isFile ? `${rootObject[obj].metadata.size} kb` : ""}
+          {isFile ? `0 kb` : ""}
         </div>
         <div className="modified">
-          {isFile ? `${rootObject[obj].metadata.modified}` : ""}
+          {isFile ? `0` : ""}
         </div>
         <div className="menu">
-          <img onClick={(e) => {this.menu(e, obj)}} src={menu} />
+          <img onClick={(e) => {this.menu(e, obj)}} src={menu} alt="img"/>
           <div className={`popup ${obj === this.state.selectedMenu ? "" : "invisible"}`}>
             {this.popupMenuOptions()}
           </div>
@@ -194,13 +193,16 @@ class App extends React.Component {
   popupMenuOptions = () => {
     let options = ["rename", "copy", "cut", "delete", "sharing"];
     return options.map((option) => {
-      return <div>
+      return <div key={option}>
         {option}
       </div>;
     });
   };
 
   favourites = () => {
+    if (!_.has(this.state.directory, "favourites")) {
+      this.state.directory.favourites = [];
+    }
     return this.state.directory.favourites.map((path) => {
       return (<div key={path} className="block">
         {_.first(path.split('/'))}
