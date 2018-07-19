@@ -2,48 +2,19 @@ import React from 'react'
 import './App.css'
 import _ from 'lodash'
 import menu from './assets/menu.png'
-import {grpc} from 'grpc-web-client'
-import {MetadataService} from './proto/metadata_pb_service'
-import {PutFileRequest} from './proto/metadata_pb'
-import {GetDirectoryKeysRequest} from './proto/metadata_pb'
+import download from './assets/download.png'
+import {uploadFile, getDirectoryKeys, deleteFile} from './FileFunctions'
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.getStructure();
+    getDirectoryKeys((keysList) => this.setState({directory: this.parseStructure(keysList)}))
     this.state = {
       directory: {},
       root: '',
-      selectedMenu: ''
+      selectedMenu: '',
+      favourites: []
     }
   }
-
-  uploadFile = (file) => {
-    let reader = new FileReader();
-    let array;
-    reader.readAsArrayBuffer(file);
-    let react = this;
-    reader.onloadend = function (evt) {
-      if (evt.target.readyState === FileReader.DONE) {
-        let arrayBuffer = evt.target.result;
-        array = new Uint8Array(arrayBuffer);
-        const putRequest = new PutFileRequest();
-        let fileName = react.state.root === '' ? file.name : root + file.name;
-        putRequest.setFile(array);
-        putRequest.setKey(fileName);
-        grpc.unary(MetadataService.PutFile, {
-          request: putRequest,
-          host: "http://localhost:10671",
-          onEnd: res => {
-            const { status, message} = res;
-
-            if (status === grpc.Code.OK && message) {
-              react.updateStructure(react, fileName);
-            }
-          }});
-      }
-
-    };
-  };
 
   parseStructure = (fileList) => {
     let struct = {};
@@ -63,32 +34,28 @@ class App extends React.Component {
     return struct;
   };
 
-  updateStructure = (react, file) => {
-    let directory = { ...react.state.directory}
-    let current = directory
-    let path = file.split('/');
-    for(let i = 0; i < path.length; i++) {
-      if(!_.has(current, path[i])) {
-        current[path[i]] = {};
-      }
-      current = current[path[i]];
-    }
-    react.setState({directory})
-  };
-
-  getStructure = () => {
-    const directoryKeys = new GetDirectoryKeysRequest();
-    grpc.unary(MetadataService.GetDirectoryKeys, {
-      request: directoryKeys,
-      host: "http://localhost:10671",
-      onEnd: res => {
-        const { status, message} = res;
-
-        if (status === grpc.Code.OK && message) {
-          this.setState({directory: this.parseStructure(message.toObject().keysList)});
+  updateStructure = (filepath, option) => {
+    let directory = { ...this.state.directory};
+    let path = filepath.split('/');
+    let current = directory;
+    switch(option) {
+      case "create":
+        for (let i = 0; i < path.length; i++) {
+          if (!_.has(current, path[i])) {
+            current[path[i]] = {};
+          }
+          current = current[path[i]];
         }
-      }
-    });
+        break;
+      case "delete":
+        for (let i = 0; i < path.length - 1; i++) {
+          current = current[path[i]];
+        }
+
+        // TODO handle folder deletion
+        delete current[_.last(path)];
+    }
+    this.setState({directory});
   };
 
   goBack = () => {
@@ -101,7 +68,7 @@ class App extends React.Component {
 
   handleFiles = (files) => {
     let file = files.target.files[0];
-    this.uploadFile(file);
+    uploadFile(file, this.state.root, (fileName) => this.updateStructure(fileName, "create"));
   };
 
   content = () => {
@@ -177,15 +144,17 @@ class App extends React.Component {
         <div className="modified">
           {isFile ? `0` : ""}
         </div>
-        <div className="menu">
-          <img onClick={(e) => {this.menu(e, obj)}} src={menu} alt="img"/>
-          <div className={`popup ${obj === this.state.selectedMenu ? "" : "invisible"}`}>
-            {this.popupMenuOptions()}
-          </div>
-        </div>
-        <div className="download">
-          TODO DL ICON
-        </div>
+        {isFile ?
+          <div className="menu">
+            <img onClick={(e) => {this.menu(e, obj)}} src={menu} alt="img"/>
+            <div className={`popup ${obj === this.state.selectedMenu ? "" : "invisible"}`}>
+              {this.popupMenuOptions()}
+            </div>
+          </div> : ''}
+        {isFile ?
+          <div className="download">
+            <img src={download}/>
+          </div> : ''}
       </div>
     })
   };
@@ -193,21 +162,29 @@ class App extends React.Component {
   popupMenuOptions = () => {
     let options = ["rename", "copy", "cut", "delete", "sharing"];
     return options.map((option) => {
-      return <div key={option}>
+      return <div key={option} onClick={() => this.handleMenuClick(option)}>
         {option}
       </div>;
     });
   };
 
-  favourites = () => {
-    if (!_.has(this.state.directory, "favourites")) {
-      this.state.directory.favourites = [];
+  handleMenuClick = (option) => {
+    console.log(option);
+    switch(option) {
+      case "delete":
+        deleteFile(this.state.root === '' ? this.state.selectedMenu : `${this.state.root}/${this.state.selectedMenu}`,
+          (filePath) => this.updateStructure(filePath, option));
     }
-    return this.state.directory.favourites.map((path) => {
-      return (<div key={path} className="block">
-        {_.first(path.split('/'))}
-      </div>);
-    });
+  };
+
+  favourites = () => {
+    if (_.has(this.state.directory, "favourites")) {
+      return this.state.directory.favourites.map((path) => {
+        return (<div key={path} className="block">
+          {_.first(path.split('/'))}
+        </div>);
+      });
+    }
   };
 
   sidebar = () => {

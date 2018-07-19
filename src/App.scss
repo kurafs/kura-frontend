@@ -38,6 +38,16 @@
             h1 {
                 width: 70%;
             }
+            div {
+                width: 15%;
+                height: 1em;
+                padding: 2vh 0 2vh 0;
+                border: 1px solid black;
+                margin-left: 2vw;
+                margin-right: 2vw;
+                display: inline-block;
+                cursor: pointer;
+            }
             label {
                 width: 15%;
                 height: 1em;
@@ -99,11 +109,11 @@
                 width: 28vw;
             }
             .menu {
-                cursor: pointer;
                 padding-left: 7vw;
                 text-align: center;
                 img {
                     width: 5vw;
+                    cursor: pointer;
                     height: 1.1vw;
                     padding-top: 3vh;
                     padding-bottom: 1vh;
@@ -129,6 +139,11 @@
             }
             .download {
                 padding-left: 6vw;
+                img {
+                    height: 5vh;
+                    padding-top: 1vh;
+                    cursor: pointer;
+                }
             }
         }
         .hover:hover {
