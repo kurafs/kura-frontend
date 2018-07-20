@@ -7,7 +7,7 @@ import {uploadFile, getDirectoryKeys, deleteFile, getFile} from './FileFunctions
 class App extends React.Component {
   constructor(props) {
     super(props);
-    getDirectoryKeys((keysList) => this.setState({directory: this.parseStructure(keysList)}))
+    getDirectoryKeys((keysList) => this.setState({directory: this.parseStructure(keysList)}));
     this.state = {
       directory: {},
       root: '',

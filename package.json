@@ -27,6 +27,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "electron": "^2.0.5",
     "ts-protoc-gen": "^0.7.6"
   }
 }
