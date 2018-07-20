@@ -95,7 +95,6 @@
             .icon {
                 width: 10vh;
                 height: 10vh;
-                content: url('assets/default_img.png');
             }
             .name {
                 text-align: left;
@@ -112,9 +111,9 @@
                 padding-left: 7vw;
                 text-align: center;
                 img {
-                    width: 5vw;
+                    width: 4vw;
                     cursor: pointer;
-                    height: 1.1vw;
+                    height: 0.88vw;
                     padding-top: 3vh;
                     padding-bottom: 1vh;
                 }
@@ -139,6 +138,8 @@
             }
             .download {
                 padding-left: 6vw;
+                padding-right: 1vw;
+
                 img {
                     height: 5vh;
                     padding-top: 1vh;

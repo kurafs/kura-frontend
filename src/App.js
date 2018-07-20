@@ -3,6 +3,8 @@ import './App.css'
 import _ from 'lodash'
 import menu from './assets/menu.png'
 import download from './assets/download.png'
+import file from './assets/file.png'
+import folder from './assets/folder.png'
 import {uploadFile, getDirectoryKeys, deleteFile, getFile} from './FileFunctions'
 class App extends React.Component {
   constructor(props) {
@@ -134,7 +136,7 @@ class App extends React.Component {
           className={`block ${isFile ? "" : " hover"}`}
           key={obj}
           id={obj}>
-        <div className="icon" />
+        <img className="icon" src={isFile ? file : folder}/>
         <div className="name">
           {obj}
         </div>
