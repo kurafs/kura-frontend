@@ -2,7 +2,7 @@ import {grpc} from 'grpc-web-client'
 import {MetadataService} from './proto/metadata_pb_service'
 import {PutFileRequest, GetDirectoryKeysRequest, DeleteFileRequest, GetFileRequest, GetFileResponse} from './proto/metadata_pb'
 
-const host = "http://b7473ace.ngrok.io";
+const host = "http://localhost:10670";
 export async function uploadFile(file, root, callback) {
   let reader = new FileReader();
   let array;

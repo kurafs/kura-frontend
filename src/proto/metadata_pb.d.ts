@@ -1,5 +1,5 @@
 // package: metadata
-// file: src/metadata.proto
+// file: src/proto/metadata.proto
 
 import * as jspb from "google-protobuf";
 
@@ -211,6 +211,11 @@ export class GetFileResponse extends jspb.Message {
   getFile_asB64(): string;
   setFile(value: Uint8Array | string): void;
 
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): FileMetadata | undefined;
+  setMetadata(value?: FileMetadata): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetFileResponse.AsObject;
   static toObject(includeInstance: boolean, msg: GetFileResponse): GetFileResponse.AsObject;
@@ -224,6 +229,7 @@ export class GetFileResponse extends jspb.Message {
 export namespace GetFileResponse {
   export type AsObject = {
     file: Uint8Array | string,
+    metadata?: FileMetadata.AsObject,
   }
 }
 
@@ -254,6 +260,11 @@ export namespace PutFileRequest {
 }
 
 export class PutFileResponse extends jspb.Message {
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): FileMetadata | undefined;
+  setMetadata(value?: FileMetadata): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PutFileResponse.AsObject;
   static toObject(includeInstance: boolean, msg: PutFileResponse): PutFileResponse.AsObject;
@@ -266,6 +277,7 @@ export class PutFileResponse extends jspb.Message {
 
 export namespace PutFileResponse {
   export type AsObject = {
+    metadata?: FileMetadata.AsObject,
   }
 }
 
