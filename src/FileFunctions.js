@@ -1,8 +1,8 @@
 import {grpc} from 'grpc-web-client'
 import {MetadataService} from './proto/metadata_pb_service'
-import {PutFileRequest, GetDirectoryKeysRequest, DeleteFileRequest} from './proto/metadata_pb'
+import {PutFileRequest, GetDirectoryKeysRequest, DeleteFileRequest, GetFileRequest, GetFileResponse} from './proto/metadata_pb'
 
-const host = "http://localhost:10671";
+const host = "http://b7473ace.ngrok.io";
 export async function uploadFile(file, root, callback) {
   let reader = new FileReader();
   let array;
@@ -46,7 +46,6 @@ export async function getDirectoryKeys(callback) {
 }
 
 export async function deleteFile(filepath, callback) {
-  console.log(filepath);
   const deleteFileRequest = new DeleteFileRequest();
   deleteFileRequest.setKey(filepath);
   grpc.unary(MetadataService.DeleteFile, {
@@ -57,6 +56,22 @@ export async function deleteFile(filepath, callback) {
 
       if (status === grpc.Code.OK && message) {
         callback(filepath);
+      }
+    }
+  });
+}
+
+export async function getFile(filepath, callback) {
+  const getFileRequest = new GetFileRequest();
+  getFileRequest.setKey(filepath);
+  grpc.unary(MetadataService.GetFile, {
+    request: getFileRequest,
+    host,
+    onEnd: res => {
+      const { status, message} = res;
+
+      if (status === grpc.Code.OK && message) {
+        callback(message.getFile_asU8());
       }
     }
   });

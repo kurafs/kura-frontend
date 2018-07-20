@@ -3,7 +3,7 @@ import './App.css'
 import _ from 'lodash'
 import menu from './assets/menu.png'
 import download from './assets/download.png'
-import {uploadFile, getDirectoryKeys, deleteFile} from './FileFunctions'
+import {uploadFile, getDirectoryKeys, deleteFile, getFile} from './FileFunctions'
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -153,10 +153,21 @@ class App extends React.Component {
           </div> : ''}
         {isFile ?
           <div className="download">
-            <img src={download}/>
+            <img onClick={() => this.downloadFile(obj)} src={download}/>
           </div> : ''}
       </div>
     })
+  };
+
+  downloadFile = (fileName) => {
+    let filepath = this.state.root === '' ? fileName : `${this.state.root}/${fileName}`;
+    getFile(filepath, (bytes) => {
+      let blob = new Blob([bytes]);
+      let link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    });
   };
 
   popupMenuOptions = () => {
