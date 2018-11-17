@@ -1,5 +1,5 @@
 import React from 'react'
-import './App.css'
+import './assets/css/App.css'
 import _ from 'lodash'
 import menu from './assets/menu.png'
 import download from './assets/download.png'
@@ -209,13 +209,14 @@ class App extends React.Component {
   };
 
   render() {
-    return (<div className="app">
-      <div className="sidebar">
-        {this.sidebar()}
-      </div>
-      <div className="content">
-        {this.content()}
-      </div>
+    return (
+      <div className="app">
+        <nav className="sidebar">
+          {this.sidebar()}
+        </nav>
+        <div className="content">
+          {this.content()}
+        </div>
     </div>);
   }
 

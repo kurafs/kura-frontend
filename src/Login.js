@@ -1,7 +1,8 @@
 import React from 'react'
-import './Login.css'
+import './assets/css/Login.css'
 import login from './LoginManager'
 import App from './App'
+import NewApp from './NewApp'
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -36,7 +37,7 @@ class Login extends React.Component {
   };
   render() {
     // if (this.state.key) {
-      return <App key={this.state.key} />
+      return <NewApp key={this.state.key} />
     // } else {
     //   return (
     //     <div className="Login">

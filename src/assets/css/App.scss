@@ -1,31 +1,3 @@
-.app {
-    display: flex;
-    overflow-y: hidden;
-    height: 100vh;
-    text-align: center;
-    font-family: Helvetica, serif;
-}
-
-.sidebar {
-    width: 25%;
-    height: 100%;
-    border-right: solid black;
-    border-width: 0 1px 0 0;
-    overflow: hidden;
-    .separator {
-        border-bottom: solid black;
-        border-width: 0 0 1px 0;
-        padding-top: 5vh;
-        width: 100%;
-    }
-
-    .block {
-        padding: 3vh 0 3vh 0;
-        border-bottom: solid black;
-        border-width: 0 0 1px 0;
-    }
-}
-
 .content {
     width: 75%;
     height: 100%;

@@ -1,0 +1,29 @@
+.home {
+  display: flex;
+  :hover {
+    cursor: pointer;
+  }
+}
+
+.topbar {
+  display: flex;
+}
+
+.icon {
+  width: 10vh;
+  height: 10vh;
+}
+
+//.react-contextmenu-wrapper {
+//  width: 100%;
+//  height: 100%;
+//}
+table {
+  margin-top: 50px;
+}
+
+img {
+  height: 100%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
