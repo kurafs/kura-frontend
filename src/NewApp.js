@@ -58,6 +58,14 @@ class NewApp extends React.Component {
     this.setState({directory});
   };
 
+  folderClick = (obj) => {
+    if (this.state.root === "") {
+      this.setState({root: obj});
+    } else {
+      this.setState({root: this.state.root + "/" + obj});
+    }
+  };
+
   goBack = () => {
     if ((this.state.root.match(/\//g) || []).length === 0) {
       this.setState({root: ''});
@@ -72,19 +80,22 @@ class NewApp extends React.Component {
   };
 
   filetable = () => {
-    return (<table className="table">
-      <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Size</th>
-        <th scope="col">Last Modifed</th>
-        <th scope="col"/>
-      </tr>
-      </thead>
-      <tbody>
-      {this.files()}
-      </tbody>
-    </table>);
+    return (
+      <main role="main" className="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Size</th>
+              <th scope="col">Last Modifed</th>
+              <th scope="col"/>
+            </tr>
+          </thead>
+          <tbody>
+            {this.files()}
+          </tbody>
+        </table>
+      </main>);
   };
   files = () => {
     let rootObject = this.state.directory;
@@ -153,19 +164,17 @@ class NewApp extends React.Component {
 
   topbar = () => {
     return (
-      <div>
-        <nav className="navbar navbar-inverse navbar-fixed-top">
-          <div className="container">
-            <div className="navbar-header topbar" href="#">
-              <a className="navbar-brand home">
-                <img src="/favicon.ico" />
-                <div>Kura</div>
-              </a>
-              <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
-            </div>
+      <nav className="navbar navbar-inverse navbar-fixed-top">
+        <div className="container">
+          <div className="navbar-header topbar" href="#">
+            <a className="navbar-brand home">
+              <img src="/favicon.ico" />
+              <div>Kura</div>
+            </a>
+            <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
           </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     );
   };
   
