@@ -74,6 +74,17 @@ class NewApp extends React.Component {
     }
   };
 
+  downloadFile = (fileName) => {
+    let filepath = this.state.root === '' ? fileName : `${this.state.root}/${fileName}`;
+    getFile(filepath, (bytes) => {
+      let blob = new Blob([bytes]);
+      let link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    });
+  };
+
   handleFiles = (files) => {
     let file = files.target.files[0];
     uploadFile(file, this.state.root, (fileName) => this.updateStructure(fileName, "create"));
@@ -130,6 +141,21 @@ class NewApp extends React.Component {
     })
   };
 
+  handleMenuClick = (e, option) => {
+    console.log(option);
+    switch(option) {
+      case "delete":
+        deleteFile(this.state.root === '' ? this.state.selectedMenu : `${this.state.root}/${this.state.selectedMenu}`,
+          (filePath) => this.updateStructure(filePath, option));
+        break;
+      case 'download':
+        this.downloadFile();
+        break;
+      default:
+        console.log('rip');
+    }
+  };
+
   menus = () => {
     let rootObject = this.state.directory;
     if(Object.keys(rootObject).length > 0 && this.state.root !== "") {
@@ -142,7 +168,7 @@ class NewApp extends React.Component {
       return (<ContextMenu id={obj} key={`${obj}-menu`}>
         {options.map((option) => {
           return (
-            <MenuItem data={{file: obj}} onClick={this.handleMenuClick}>
+            <MenuItem data={{file: obj, option}} onClick={this.handleMenuClick}>
               {option}
             </MenuItem>
           );
