@@ -10,7 +10,7 @@ class NewApp extends React.Component {
     getDirectoryKeys((keysList) => this.setState({directory: this.parseStructure(keysList)}));
     this.state = {
       directory: {},
-      root: '',
+      root: this.props.match.params['path'] || '',
       selectedMenu: '',
       favourites: []
     }
@@ -99,7 +99,7 @@ class NewApp extends React.Component {
   };
   files = () => {
     let rootObject = this.state.directory;
-    if(this.state.root !== "") {
+    if (Object.keys(rootObject).length > 0 && this.state.root !== "") {
       this.state.root.split('/').forEach((dir) => {
         rootObject = rootObject[dir];
       })
@@ -132,7 +132,7 @@ class NewApp extends React.Component {
 
   menus = () => {
     let rootObject = this.state.directory;
-    if(this.state.root !== "") {
+    if(Object.keys(rootObject).length > 0 && this.state.root !== "") {
       this.state.root.split('/').forEach((dir) => {
         rootObject = rootObject[dir];
       })
