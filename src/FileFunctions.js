@@ -12,7 +12,7 @@ export async function uploadFile(file, root, callback) {
       let arrayBuffer = evt.target.result;
       array = new Uint8Array(arrayBuffer);
       const putRequest = new Metadata.PutFileRequest();
-      let fileName = root === '' ? file.name : root + file.name;
+      let fileName = root + file.name;
       putRequest.setFile(array);
       putRequest.setKey(fileName);
       grpc.unary(MetadataService.PutFile, {
@@ -35,11 +35,38 @@ export async function getDirectoryKeys(callback) {
   grpc.unary(MetadataService.GetDirectoryKeys, {
     request: directoryKeys,
     host,
-    onEnd: res => {
+    onEnd: (res) => {
       const { status, message} = res;
 
       if (status === grpc.Code.OK && message) {
         callback(message.toObject().keysList);
+      }
+    }
+  });
+}
+
+export async function getTopLevelMetadata() {
+  // let directory = {};
+  // const promises = keysList.map(
+  //   (key) =>
+  //     getMetadata(key,
+  //       (obj) => {directory[key] = {}})
+  // );
+  // await Promise.all(promises);
+}
+
+export async function getMetadata(key, callback) {
+  const metadata = new Metadata.GetMetadataRequest();
+  metadata.setKey(key);
+  grpc.unary(MetadataService.GetMetadata, {
+    request: metadata,
+    host,
+    onEnd: res => {
+      const { status, message} = res;
+
+      if (status === grpc.Code.OK && message) {
+        console.log(message.toObject());
+        callback(message.toObject());
       }
     }
   });

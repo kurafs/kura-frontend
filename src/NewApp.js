@@ -3,11 +3,13 @@ import './assets/css/NewApp.css'
 import './assets/css/bootstrap.css'
 import _ from 'lodash'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import {uploadFile, getDirectoryKeys, deleteFile, getFile} from './FileFunctions'
+import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './FileFunctions'
 class NewApp extends React.Component {
   constructor(props) {
     super(props);
-    getDirectoryKeys((keysList) => this.setState({directory: this.parseStructure(keysList)}));
+    getDirectoryKeys(
+      (keysList) => {this.setState({directory: this.parseStructure(keysList)});console.log(keysList)}
+      );
     this.state = {
       directory: {},
       root: this.props.match.params['path'] || '',
@@ -18,18 +20,38 @@ class NewApp extends React.Component {
 
   parseStructure = (fileList) => {
     let struct = {};
-    for(let i = 0; i < fileList.length; i++) {
-      let path = fileList[i].split('/');
+    for(let file of fileList) {
+      let path = file.split('/');
       let current = struct;
-      for (let j = 0; j < path.length; j++) {
-        if(path[j] === '') {
+      for (let key of path) {
+        if(key === '') {
           break;
         }
-        if(!_.has(current, path[j])) {
-          current[path[j]] = {};
+        if(!_.has(current, key)) {
+          current[key] = {};
         }
-        current = current[path[j]];
+        current = current[key];
       }
+    }
+
+    for(let file of fileList) {
+      getMetadata(file, (obj) => {
+        let newDirectory = Object.assign({}, this.state.directory);
+        let filename = _.last(file.split('/'));
+        if (!file.includes('/')) {
+          newDirectory[filename] = {
+            lastModified: obj.metadata.lastModified,
+            size: obj.metadata.size
+          }
+        } else {
+          let path = file.replace(`/${filename}`, `["${filename}"]`).replace(/\//g,'.');
+          _.set(newDirectory, path, {
+            lastModified: obj.metadata.lastModified,
+            size: obj.metadata.size
+          });
+        }
+        this.setState({directory: newDirectory});
+      });
     }
     return struct;
   };
@@ -54,6 +76,9 @@ class NewApp extends React.Component {
 
         // TODO handle folder deletion
         delete current[_.last(path)];
+        break;
+      default:
+        // do nothing
     }
     this.setState({directory});
   };
@@ -116,7 +141,7 @@ class NewApp extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let isFile = Object.keys(rootObject[obj]).length === 0;
+      let isFile = rootObject[obj].hasOwnProperty('size');
       return <tr
         onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
         className={`block ${isFile ? "" : " hover"}`}
@@ -129,12 +154,12 @@ class NewApp extends React.Component {
         </td>
         <td>
           <ContextMenuTrigger id={obj}>
-            {isFile ? `0 kb` : ""}
+            {isFile ? `${rootObject[obj].size} b` : ""}
           </ContextMenuTrigger>
         </td>
         <td>
           <ContextMenuTrigger id={obj}>
-            {isFile ? `0` : ""}
+            {isFile ? rootObject[obj].lastModified.seconds : ""}
           </ContextMenuTrigger>
         </td>
       </tr>
@@ -168,7 +193,7 @@ class NewApp extends React.Component {
       return (<ContextMenu id={obj} key={`${obj}-menu`}>
         {options.map((option) => {
           return (
-            <MenuItem data={{file: obj, option}} onClick={this.handleMenuClick}>
+            <MenuItem key={option} className="dropdown-menu" data={{file: obj, option}} onClick={this.handleMenuClick}>
               {option}
             </MenuItem>
           );
@@ -194,11 +219,13 @@ class NewApp extends React.Component {
         <div className="container">
           <div className="navbar-header topbar" href="#">
             <a className="navbar-brand home">
-              <img src="/favicon.ico" />
+              <img src="/favicon.ico" alt="Kura"/>
               <div>Kura</div>
             </a>
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
           </div>
+          <button className="navbar-btn" onClick={this.goBack}>Back</button>
+          <input type="file" onChange={(files) => this.handleFiles(files)}/>
         </div>
       </nav>
     );
@@ -210,19 +237,19 @@ class NewApp extends React.Component {
       <div className="sidebar-sticky">
         <ul className="nav flex-column">
           <li className="nav-item">
-            <a className="nav-link active" href="#">
+            <a className="nav-link active" href="">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
               Dashboard <span className="sr-only">(current)</span>
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <a className="nav-link" href="">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
               Orders
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
+            <a className="nav-link" href="">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
               Orders
             </a>

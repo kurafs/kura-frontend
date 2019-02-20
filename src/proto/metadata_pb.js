@@ -74,7 +74,7 @@ proto.metadata.FileMetadata.toObject = function(includeInstance, msg) {
   var f, obj = {
     created: (f = msg.getCreated()) && proto.metadata.FileMetadata.UnixTimestamp.toObject(includeInstance, f),
     lastModified: (f = msg.getLastModified()) && proto.metadata.FileMetadata.UnixTimestamp.toObject(includeInstance, f),
-    permissions: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    permissions: jspb.Message.getFieldWithDefault(msg, 3, 0),
     size: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
@@ -123,7 +123,7 @@ proto.metadata.FileMetadata.deserializeBinaryFromReader = function(msg, reader) 
       msg.setLastModified(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readUint32());
       msg.setPermissions(value);
       break;
     case 4:
@@ -176,8 +176,8 @@ proto.metadata.FileMetadata.serializeBinaryToWriter = function(message, writer) 
     );
   }
   f = message.getPermissions();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0) {
+    writer.writeUint32(
       3,
       f
     );
@@ -422,17 +422,17 @@ proto.metadata.FileMetadata.prototype.hasLastModified = function() {
 
 
 /**
- * optional string permissions = 3;
- * @return {string}
+ * optional uint32 permissions = 3;
+ * @return {number}
  */
 proto.metadata.FileMetadata.prototype.getPermissions = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {string} value */
+/** @param {number} value */
 proto.metadata.FileMetadata.prototype.setPermissions = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
+  jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
@@ -1522,8 +1522,7 @@ proto.metadata.GetFileResponse.prototype.toObject = function(opt_includeInstance
  */
 proto.metadata.GetFileResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    file: msg.getFile_asB64(),
-    metadata: (f = msg.getMetadata()) && proto.metadata.FileMetadata.toObject(includeInstance, f)
+    file: msg.getFile_asB64()
   };
 
   if (includeInstance) {
@@ -1564,11 +1563,6 @@ proto.metadata.GetFileResponse.deserializeBinaryFromReader = function(msg, reade
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
       msg.setFile(value);
       break;
-    case 2:
-      var value = new proto.metadata.FileMetadata;
-      reader.readMessage(value,proto.metadata.FileMetadata.deserializeBinaryFromReader);
-      msg.setMetadata(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -1603,14 +1597,6 @@ proto.metadata.GetFileResponse.serializeBinaryToWriter = function(message, write
     writer.writeBytes(
       1,
       f
-    );
-  }
-  f = message.getMetadata();
-  if (f != null) {
-    writer.writeMessage(
-      2,
-      f,
-      proto.metadata.FileMetadata.serializeBinaryToWriter
     );
   }
 };
@@ -1652,36 +1638,6 @@ proto.metadata.GetFileResponse.prototype.getFile_asU8 = function() {
 /** @param {!(string|Uint8Array)} value */
 proto.metadata.GetFileResponse.prototype.setFile = function(value) {
   jspb.Message.setProto3BytesField(this, 1, value);
-};
-
-
-/**
- * optional FileMetadata metadata = 2;
- * @return {?proto.metadata.FileMetadata}
- */
-proto.metadata.GetFileResponse.prototype.getMetadata = function() {
-  return /** @type{?proto.metadata.FileMetadata} */ (
-    jspb.Message.getWrapperField(this, proto.metadata.FileMetadata, 2));
-};
-
-
-/** @param {?proto.metadata.FileMetadata|undefined} value */
-proto.metadata.GetFileResponse.prototype.setMetadata = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-proto.metadata.GetFileResponse.prototype.clearMetadata = function() {
-  this.setMetadata(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.metadata.GetFileResponse.prototype.hasMetadata = function() {
-  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -1925,7 +1881,7 @@ proto.metadata.PutFileResponse.prototype.toObject = function(opt_includeInstance
  */
 proto.metadata.PutFileResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    metadata: (f = msg.getMetadata()) && proto.metadata.FileMetadata.toObject(includeInstance, f)
+
   };
 
   if (includeInstance) {
@@ -1962,11 +1918,6 @@ proto.metadata.PutFileResponse.deserializeBinaryFromReader = function(msg, reade
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 1:
-      var value = new proto.metadata.FileMetadata;
-      reader.readMessage(value,proto.metadata.FileMetadata.deserializeBinaryFromReader);
-      msg.setMetadata(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -1996,44 +1947,6 @@ proto.metadata.PutFileResponse.prototype.serializeBinary = function() {
  */
 proto.metadata.PutFileResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMetadata();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      proto.metadata.FileMetadata.serializeBinaryToWriter
-    );
-  }
-};
-
-
-/**
- * optional FileMetadata metadata = 1;
- * @return {?proto.metadata.FileMetadata}
- */
-proto.metadata.PutFileResponse.prototype.getMetadata = function() {
-  return /** @type{?proto.metadata.FileMetadata} */ (
-    jspb.Message.getWrapperField(this, proto.metadata.FileMetadata, 1));
-};
-
-
-/** @param {?proto.metadata.FileMetadata|undefined} value */
-proto.metadata.PutFileResponse.prototype.setMetadata = function(value) {
-  jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-proto.metadata.PutFileResponse.prototype.clearMetadata = function() {
-  this.setMetadata(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.metadata.PutFileResponse.prototype.hasMetadata = function() {
-  return jspb.Message.getField(this, 1) != null;
 };
 
 

@@ -25,7 +25,7 @@ message FileMetadata {
     }
     UnixTimestamp created = 1;
     UnixTimestamp last_modified = 2;
-    string permissions = 3;
+    uint32 permissions = 3;
     int64 size = 4;
 }
 
@@ -56,7 +56,6 @@ message GetFileRequest {
 
 message GetFileResponse {
     bytes file = 1;
-    FileMetadata metadata = 2;
 }
 
 message PutFileRequest {
@@ -64,9 +63,7 @@ message PutFileRequest {
     bytes file = 2;
 }
 
-message PutFileResponse {
-    FileMetadata metadata = 1;
-}
+message PutFileResponse { }
 
 message DeleteFileRequest {
     string key = 1;
