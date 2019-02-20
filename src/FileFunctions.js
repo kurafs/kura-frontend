@@ -65,7 +65,6 @@ export async function getMetadata(key, callback) {
       const { status, message} = res;
 
       if (status === grpc.Code.OK && message) {
-        console.log(message.toObject());
         callback(message.toObject());
       }
     }

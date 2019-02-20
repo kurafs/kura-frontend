@@ -2,19 +2,21 @@ import React from 'react'
 import './assets/css/NewApp.css'
 import './assets/css/bootstrap.css'
 import _ from 'lodash'
+import moment from 'moment'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './FileFunctions'
 class NewApp extends React.Component {
   constructor(props) {
     super(props);
     getDirectoryKeys(
-      (keysList) => {this.setState({directory: this.parseStructure(keysList)});console.log(keysList)}
+      (keysList) => this.setState({directory: this.parseStructure(keysList)})
       );
     this.state = {
       directory: {},
       root: this.props.match.params['path'] || '',
       selectedMenu: '',
-      favourites: []
+      favourites: [],
+      sortOrder: 'name'
     }
   }
 
@@ -40,13 +42,13 @@ class NewApp extends React.Component {
         let filename = _.last(file.split('/'));
         if (!file.includes('/')) {
           newDirectory[filename] = {
-            lastModified: obj.metadata.lastModified,
+            lastModified: obj.metadata.lastModified.seconds,
             size: obj.metadata.size
           }
         } else {
           let path = file.replace(`/${filename}`, `["${filename}"]`).replace(/\//g,'.');
           _.set(newDirectory, path, {
-            lastModified: obj.metadata.lastModified,
+            lastModified: obj.metadata.lastModified.seconds,
             size: obj.metadata.size
           });
         }
@@ -140,30 +142,57 @@ class NewApp extends React.Component {
         rootObject = rootObject[dir];
       })
     }
-    return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let isFile = rootObject[obj].hasOwnProperty('size');
-      return <tr
-        onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
-        className={`block ${isFile ? "" : " hover"}`}
-        key={obj}
-        id={obj}>
-        <td>
-          <ContextMenuTrigger id={obj}>
-            {obj}
-          </ContextMenuTrigger>
-        </td>
-        <td>
-          <ContextMenuTrigger id={obj}>
-            {isFile ? `${rootObject[obj].size} b` : ""}
-          </ContextMenuTrigger>
-        </td>
-        <td>
-          <ContextMenuTrigger id={obj}>
-            {isFile ? rootObject[obj].lastModified.seconds : ""}
-          </ContextMenuTrigger>
-        </td>
-      </tr>
-    })
+    return Object.keys(rootObject)
+      .filter(obj => obj!=='favourites')
+      .sort((key1, key2) => this.sortOrder(rootObject, key1, key2))
+      .map(obj => {
+        let isFile = rootObject[obj].hasOwnProperty('size');
+        return <tr
+          onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
+          className={`block ${isFile ? "" : " hover"}`}
+          key={obj}
+          id={obj}>
+          <td>
+            <ContextMenuTrigger id={obj}>
+              {obj}
+            </ContextMenuTrigger>
+          </td>
+          <td>
+            <ContextMenuTrigger id={obj}>
+              {isFile ? this.formatFileSize(rootObject[obj].size) : ""}
+            </ContextMenuTrigger>
+          </td>
+          <td>
+            <ContextMenuTrigger id={obj}>
+              {isFile ? this.formatDate(rootObject[obj].lastModified) : ""}
+            </ContextMenuTrigger>
+          </td>
+        </tr>
+      })
+  };
+
+  formatFileSize = (size) => {
+    if (size < 1000) {
+      return `${size} B`;
+    }
+
+    if (size < 1000000) {
+      return `${Math.floor(size/1000)} KB`;
+    }
+
+    if (size < 1000000000) {
+      return `${Math.floor(size/1000000)} MB`;
+    }
+
+    return `${Math.floor(size/1000000000)} GB`;
+  };
+
+  formatDate = (time) => {
+    return moment.unix(time).format('MMM Do YYYY, LT');
+  };
+
+  sortOrder = (structure, key1, key2) => {
+    return key1 >= key2 ? -1: 1;
   };
 
   handleMenuClick = (e, option) => {
@@ -225,7 +254,7 @@ class NewApp extends React.Component {
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
           </div>
           <button className="navbar-btn" onClick={this.goBack}>Back</button>
-          <input type="file" onChange={(files) => this.handleFiles(files)}/>
+          {/*<input type="file" onChange={(files) => this.handleFiles(files)}/>*/}
         </div>
       </nav>
     );
