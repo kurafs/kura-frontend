@@ -195,18 +195,18 @@ class NewApp extends React.Component {
     return key1 >= key2 ? -1: 1;
   };
 
-  handleMenuClick = (e, option) => {
-    console.log(option);
-    switch(option) {
-      case "delete":
+  handleMenuClick = (e, config) => {
+    console.log(config);
+    switch(config.option) {
+      case "Delete":
         deleteFile(this.state.root === '' ? this.state.selectedMenu : `${this.state.root}/${this.state.selectedMenu}`,
-          (filePath) => this.updateStructure(filePath, option));
+          (filePath) => this.updateStructure(filePath, config.file));
         break;
-      case 'download':
-        this.downloadFile();
+      case 'Download':
+        this.downloadFile(config.file);
         break;
       default:
-        console.log('rip');
+        window.alert('not implemented!');
     }
   };
 
@@ -218,7 +218,7 @@ class NewApp extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let options = ["rename", "copy", "cut", "delete", "sharing"];
+      let options = ["Download", "Rename", "Copy", "Cut", "Delete", "Sharing"];
       return (<ContextMenu id={obj} key={`${obj}-menu`}>
         {options.map((option) => {
           return (

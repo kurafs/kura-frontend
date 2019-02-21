@@ -23,6 +23,21 @@
   margin-left: 10px;
 }
 
+.react-contextmenu--visible {
+  background: whitesmoke;
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 5px 0;
+}
+
+.react-contextmenu-item {
+  padding: 5px 5px;
+}
+
+.react-contextmenu-item--selected {
+  background: #d6d6d6;
+}
+
 //.react-contextmenu-wrapper {
 //  width: 100%;
 //  height: 100%;
