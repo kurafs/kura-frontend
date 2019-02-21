@@ -18,9 +18,26 @@
   margin-top: 8px;
 }
 
-.container button {
+.topbar button {
   margin-top: 12px;
   margin-left: 10px;
+  padding-right: 10px;
+  border-radius: 5px;
+}
+
+label {
+  background: white;
+  font-weight: normal !important;
+  margin-top: 13px;
+  width: 109px;
+  height: 28px;
+  margin-left: 12px;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px hsl(0, 0%, 80%);
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .react-contextmenu--visible {

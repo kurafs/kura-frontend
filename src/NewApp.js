@@ -14,7 +14,6 @@ class NewApp extends React.Component {
     this.state = {
       directory: {},
       root: this.props.match.params['path'] || '',
-      selectedMenu: '',
       favourites: [],
       sortOrder: 'name'
     }
@@ -199,7 +198,7 @@ class NewApp extends React.Component {
     console.log(config);
     switch(config.option) {
       case "Delete":
-        deleteFile(this.state.root === '' ? this.state.selectedMenu : `${this.state.root}/${this.state.selectedMenu}`,
+        deleteFile(this.state.root === '' ? config.file : `${this.state.root}/${config.file}`,
           (filePath) => this.updateStructure(filePath, config.file));
         break;
       case 'Download':
@@ -252,9 +251,10 @@ class NewApp extends React.Component {
               <div>Kura</div>
             </a>
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
+            <button className="navbar-btn" onClick={this.goBack}>Back</button>
+            <input type="file" id="files" className="hidden" onChange={(files) => this.handleFiles(files)}/>
+            <label htmlFor="files">Upload</label>
           </div>
-          <button className="navbar-btn" onClick={this.goBack}>Back</button>
-          {/*<input type="file" onChange={(files) => this.handleFiles(files)}/>*/}
         </div>
       </nav>
     );
