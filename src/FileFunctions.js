@@ -3,26 +3,28 @@ import {MetadataService} from './proto/metadata_pb_service'
 import Metadata from './proto/metadata_pb'
 
 const host = "http://localhost:10670";
-export async function uploadFile(file, root, callback) {
+export async function uploadFile(data, path, callback) {
   let reader = new FileReader();
   let array;
-  reader.readAsArrayBuffer(file);
+  if (data.size > 40000000) {
+    window.alert('File too big! (4MB max)');
+    return;
+  }
+  reader.readAsArrayBuffer(data);
   reader.onloadend = function (evt) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;
       array = new Uint8Array(arrayBuffer);
       const putRequest = new Metadata.PutFileRequest();
-      let fileName = root + file.name;
       putRequest.setFile(array);
-      putRequest.setKey(fileName);
+      putRequest.setKey(path);
       grpc.unary(MetadataService.PutFile, {
         request: putRequest,
         host,
         onEnd: res => {
           const { status, message} = res;
-
           if (status === grpc.Code.OK && message) {
-            callback(fileName);
+            callback(path);
           }
         }});
     }
@@ -43,16 +45,6 @@ export async function getDirectoryKeys(callback) {
       }
     }
   });
-}
-
-export async function getTopLevelMetadata() {
-  // let directory = {};
-  // const promises = keysList.map(
-  //   (key) =>
-  //     getMetadata(key,
-  //       (obj) => {directory[key] = {}})
-  // );
-  // await Promise.all(promises);
 }
 
 export async function getMetadata(key, callback) {
@@ -79,7 +71,6 @@ export async function deleteFile(filepath, callback) {
     host,
     onEnd: res => {
       const { status, message} = res;
-
       if (status === grpc.Code.OK && message) {
         callback(filepath);
       }

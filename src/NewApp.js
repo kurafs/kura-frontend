@@ -19,6 +19,30 @@ class NewApp extends React.Component {
     }
   }
 
+  setDirectory = (filepath, obj) => {
+    let newDirectory = Object.assign({}, this.state.directory);
+    let filename = _.last(filepath.split('/'));
+    if (!filepath.includes('/')) {
+      newDirectory[filename] = obj
+    } else {
+      let path = filepath.replace(`/${filename}`, `["${filename}"]`).replace(/\//g,'.');
+      _.set(newDirectory, path, obj);
+    }
+    this.setState({directory: newDirectory});
+  };
+
+  unsetDirectory = (filepath) => {
+    let newDirectory = Object.assign({}, this.state.directory);
+    let filename = _.last(filepath.split('/'));
+    if (!filepath.includes('/')) {
+      delete newDirectory[filename];
+    } else {
+      let path = filepath.replace(`/${filename}`, `["${filename}"]`).replace(/\//g,'.');
+      _.unset(newDirectory, path);
+    }
+    this.setState({directory: newDirectory});
+  };
+
   parseStructure = (fileList) => {
     let struct = {};
     for(let file of fileList) {
@@ -37,51 +61,33 @@ class NewApp extends React.Component {
 
     for(let file of fileList) {
       getMetadata(file, (obj) => {
-        let newDirectory = Object.assign({}, this.state.directory);
-        let filename = _.last(file.split('/'));
-        if (!file.includes('/')) {
-          newDirectory[filename] = {
-            lastModified: obj.metadata.lastModified.seconds,
-            size: obj.metadata.size
+        this.setDirectory(file, {
+              lastModified: obj.metadata.lastModified.seconds,
+              size: obj.metadata.size
           }
-        } else {
-          let path = file.replace(`/${filename}`, `["${filename}"]`).replace(/\//g,'.');
-          _.set(newDirectory, path, {
-            lastModified: obj.metadata.lastModified.seconds,
-            size: obj.metadata.size
-          });
-        }
-        this.setState({directory: newDirectory});
+        )
       });
     }
     return struct;
   };
 
   updateStructure = (filepath, option) => {
-    let directory = { ...this.state.directory};
-    let path = filepath.split('/');
-    let current = directory;
     switch(option) {
       case "create":
-        for (let i = 0; i < path.length; i++) {
-          if (!_.has(current, path[i])) {
-            current[path[i]] = {};
-          }
-          current = current[path[i]];
-        }
+        this.setDirectory(filepath, {lastModified: 0, size: 0});
+        getMetadata(filepath, (obj) => {
+          this.setDirectory(filepath, {
+            lastModified: obj.metadata.lastModified.seconds,
+            size: obj.metadata.size
+          })
+        });
         break;
       case "delete":
-        for (let i = 0; i < path.length - 1; i++) {
-          current = current[path[i]];
-        }
-
-        // TODO handle folder deletion
-        delete current[_.last(path)];
+        this.unsetDirectory(filepath);
         break;
       default:
         // do nothing
     }
-    this.setState({directory});
   };
 
   folderClick = (obj) => {
@@ -113,7 +119,8 @@ class NewApp extends React.Component {
 
   handleFiles = (files) => {
     let file = files.target.files[0];
-    uploadFile(file, this.state.root, (fileName) => this.updateStructure(fileName, "create"));
+    let path = this.state.root === '' ? file.name : `${this.state.root}/${file.name}`;
+    uploadFile(file, path, (fileName) => this.updateStructure(fileName, "create"));
   };
 
   filetable = () => {
@@ -195,11 +202,10 @@ class NewApp extends React.Component {
   };
 
   handleMenuClick = (e, config) => {
-    console.log(config);
     switch(config.option) {
       case "Delete":
         deleteFile(this.state.root === '' ? config.file : `${this.state.root}/${config.file}`,
-          (filePath) => this.updateStructure(filePath, config.file));
+          (filePath) => this.updateStructure(filePath, 'delete'));
         break;
       case 'Download':
         this.downloadFile(config.file);
@@ -217,7 +223,7 @@ class NewApp extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let options = ["Download", "Rename", "Copy", "Cut", "Delete", "Sharing"];
+      let options = ["Download", "Delete"];
       return (<ContextMenu id={obj} key={`${obj}-menu`}>
         {options.map((option) => {
           return (
@@ -286,9 +292,6 @@ class NewApp extends React.Component {
         </ul>
       </div>
     </nav>);
-  };
-  handleClick = (e, data) => {
-    console.log(data.file);
   };
   render() {
     return (<div>
