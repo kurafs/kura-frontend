@@ -44,3 +44,5 @@ yarn-error.log*
 package-lock.json
 #css files are generated from sass
 src/**/*.css
+!bootstrap.css
+!bootstrap-theme.css
