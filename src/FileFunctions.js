@@ -3,14 +3,15 @@ import {MetadataService} from './proto/metadata_pb_service'
 import Metadata from './proto/metadata_pb'
 
 const host = "http://localhost:10670";
-export async function uploadFile(data, path, callback) {
+export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;
-  if (data.size > 40000000) {
+  if (data.size > 4000000) {
     window.alert('File too big! (4MB max)');
     return;
   }
-  reader.readAsArrayBuffer(data);
+  reader.readAsDataURL(data);
+  reader.onprogress = (data) => { progress(data) };
   reader.onloadend = function (evt) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;

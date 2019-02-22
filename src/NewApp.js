@@ -15,7 +15,8 @@ class NewApp extends React.Component {
       directory: {},
       root: this.props.match.params['path'] || '',
       favourites: [],
-      sortOrder: 'name'
+      sortOrder: 'name',
+      progress: 0
     }
   }
 
@@ -120,7 +121,15 @@ class NewApp extends React.Component {
   handleFiles = (files) => {
     let file = files.target.files[0];
     let path = this.state.root === '' ? file.name : `${this.state.root}/${file.name}`;
-    uploadFile(file, path, (fileName) => this.updateStructure(fileName, "create"));
+    uploadFile(file, path,
+      (fileName) => this.updateStructure(fileName, "create"),
+      (data) => {
+        console.log(data.loaded);
+        if(data.lengthComputable) {
+          this.setState({progress: data.loaded * 100 / data.total});
+        }
+      }
+    );
   };
 
   filetable = () => {
@@ -236,17 +245,6 @@ class NewApp extends React.Component {
     });
   };
 
-  downloadFile = (fileName) => {
-    let filepath = this.state.root === '' ? fileName : `${this.state.root}/${fileName}`;
-    getFile(filepath, (bytes) => {
-      let blob = new Blob([bytes]);
-      let link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = fileName;
-      link.click();
-    });
-  };
-
   topbar = () => {
     return (
       <nav className="navbar navbar-inverse navbar-fixed-top">
@@ -260,6 +258,7 @@ class NewApp extends React.Component {
             <button className="navbar-btn" onClick={this.goBack}>Back</button>
             <input type="file" id="files" className="hidden" onChange={(files) => this.handleFiles(files)}/>
             <label htmlFor="files">Upload</label>
+            {/*<div className="test">{this.state.progress}</div>*/}
           </div>
         </div>
       </nav>
