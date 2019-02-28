@@ -25,6 +25,13 @@
   border-radius: 5px;
 }
 
+td {
+  padding: 0 !important;
+  .react-contextmenu-wrapper {
+    padding: 8px;
+  }
+}
+
 .test {
   background: white;
   margin-left: 5px;
@@ -66,9 +73,14 @@ label {
 //  height: 100%;
 //}
 
-.hover:hover{
+.folder:hover {
   background: #d3d3d359;
 }
+
+.selected {
+  background: #d3d3d359;
+}
+
 table {
   margin-top: 50px;
 }

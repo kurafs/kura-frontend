@@ -1,10 +1,22 @@
 import React from 'react'
 import './assets/css/NewApp.css'
 import './assets/css/bootstrap.css'
+import Modal from 'react-modal';
 import _ from 'lodash'
 import moment from 'moment'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './FileFunctions'
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+
 class NewApp extends React.Component {
   constructor(props) {
     super(props);
@@ -16,8 +28,14 @@ class NewApp extends React.Component {
       root: this.props.match.params['path'] || '',
       favourites: [],
       sortOrder: 'name',
-      progress: 0
-    }
+      progress: 0,
+      cutFile: '',
+      selected: '',
+      modalIsOpen: false
+    };
+    this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   setDirectory = (filepath, obj) => {
@@ -161,10 +179,11 @@ class NewApp extends React.Component {
       .filter(obj => obj!=='favourites')
       .sort((key1, key2) => this.sortOrder(rootObject, key1, key2))
       .map(obj => {
-        let isFile = rootObject[obj].hasOwnProperty('size');
+        const isFile = rootObject[obj].hasOwnProperty('size');
+        const selected = this.state.selected === obj;
         return <tr
           onClick={isFile ? ()=>{} : () =>{this.folderClick(obj)}}
-          className={`block ${isFile ? "" : " hover"}`}
+          className={`block ${isFile ? "" : " folder"} ${selected ? 'selected' : ''}`}
           key={obj}
           id={obj}>
           <td>
@@ -183,7 +202,7 @@ class NewApp extends React.Component {
             </ContextMenuTrigger>
           </td>
         </tr>
-      })
+      });
   };
 
   formatFileSize = (size) => {
@@ -211,17 +230,30 @@ class NewApp extends React.Component {
   };
 
   handleMenuClick = (e, config) => {
+    const filePath = this.state.root === '' ? config.file : `${this.state.root}/${config.file}`;
     switch(config.option) {
       case "Delete":
-        deleteFile(this.state.root === '' ? config.file : `${this.state.root}/${config.file}`,
-          (filePath) => this.updateStructure(filePath, 'delete'));
+        deleteFile(filePath, (file) => this.updateStructure(file, 'delete'));
         break;
       case 'Download':
         this.downloadFile(config.file);
         break;
+      case 'Cut':
+        this.setState({cutFile: filePath});
+        break;
+      case 'Paste':
+        this.setState({copiedFile: ''});
+        break;
+      case 'Rename':
+        this.setState({modalIsOpen: true});
+        break;
       default:
         window.alert('not implemented!');
     }
+  };
+
+  showMenu = (obj) => {
+    this.setState({selected: obj});
   };
 
   menus = () => {
@@ -231,9 +263,9 @@ class NewApp extends React.Component {
         rootObject = rootObject[dir];
       })
     }
-    return Object.keys(rootObject).filter(obj => obj!=='favourites').map(obj => {
-      let options = ["Download", "Delete"];
-      return (<ContextMenu id={obj} key={`${obj}-menu`}>
+    return Object.keys(rootObject).filter(obj => obj!=='favourites' && rootObject[obj].hasOwnProperty('size')).map(obj => {
+      let options = ["Download", "Delete", "Rename"];
+      return (<ContextMenu id={obj} key={`${obj}-menu` } onShow={() => this.showMenu(obj)} onHide={() => this.showMenu('')}>
         {options.map((option) => {
           return (
             <MenuItem key={option} className="dropdown-menu" data={{file: obj, option}} onClick={this.handleMenuClick}>
@@ -292,12 +324,45 @@ class NewApp extends React.Component {
       </div>
     </nav>);
   };
+
+  openModal() {
+    this.setState({modalIsOpen: true});
+  }
+
+  afterOpenModal() {
+
+  }
+
+  closeModal() {
+    this.setState({modalIsOpen: false});
+  }
+
+  modal = () => {
+    return (<Modal
+      isOpen={this.state.modalIsOpen}
+      onAfterOpen={this.afterOpenModal}
+      onRequestClose={this.closeModal}
+      style={customStyles}
+      contentLabel="Rename Modal"
+    >
+
+      <h2 ref={subtitle => this.subtitle = subtitle}>Rename</h2>
+      <br />
+      <form onSubmit={(e)=>{e.preventDefault(); console.log('test')}}>
+        <input id="filename"/>
+        {"    "}
+        <input type="submit"/>
+      </form>
+    </Modal>);
+  };
+
   render() {
     return (<div>
       {this.topbar()}
       {/*{this.sidebar()}*/}
       {this.filetable()}
       {this.menus()}
+      {this.modal()}
     </div>);
   }
 }
