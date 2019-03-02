@@ -1,11 +1,11 @@
-import React from 'react'
-import './assets/css/NewApp.css'
-import './assets/css/bootstrap.css'
+import React from 'react';
+import './assets/css/NewApp.css';
+import './assets/css/bootstrap.css';
 import Modal from 'react-modal';
-import _ from 'lodash'
-import moment from 'moment'
+import _ from 'lodash';
+import moment from 'moment';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './FileFunctions'
+import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './FileFunctions';
 const customStyles = {
   content : {
     top                   : '50%',
@@ -136,7 +136,7 @@ class NewApp extends React.Component {
     });
   };
 
-  handleFiles = (files) => {
+  uploadFiles = (files) => {
     let file = files.target.files[0];
     let path = this.state.root === '' ? file.name : `${this.state.root}/${file.name}`;
     uploadFile(file, path,
@@ -244,9 +244,9 @@ class NewApp extends React.Component {
       case 'Paste':
         this.setState({copiedFile: ''});
         break;
-      case 'Rename':
-        this.setState({modalIsOpen: true});
-        break;
+      // case 'Rename':
+      //   this.setState({modalIsOpen: true});
+      //   break;
       default:
         window.alert('not implemented!');
     }
@@ -264,7 +264,7 @@ class NewApp extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(obj => obj!=='favourites' && rootObject[obj].hasOwnProperty('size')).map(obj => {
-      let options = ["Download", "Delete", "Rename"];
+      let options = ["Download", "Delete"];
       return (<ContextMenu id={obj} key={`${obj}-menu` } onShow={() => this.showMenu(obj)} onHide={() => this.showMenu('')}>
         {options.map((option) => {
           return (
@@ -288,7 +288,7 @@ class NewApp extends React.Component {
             </a>
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" />
             <button className="navbar-btn" onClick={this.goBack}>Back</button>
-            <input type="file" id="files" className="hidden" onChange={(files) => this.handleFiles(files)}/>
+            <input type="file" id="files" className="hidden" onChange={(files) => this.uploadFiles(files)}/>
             <label htmlFor="files">Upload</label>
             {/*<div className="test">{this.state.progress}</div>*/}
           </div>
@@ -330,7 +330,11 @@ class NewApp extends React.Component {
   }
 
   afterOpenModal() {
-
+    const inputBox = document.getElementById('filename');
+    inputBox.value = this.state.selected;
+    inputBox.selectionStart = 0;
+    inputBox.selectionEnd = this.state.selected.indexOf('.');
+    inputBox.focus();
   }
 
   closeModal() {
@@ -348,12 +352,20 @@ class NewApp extends React.Component {
 
       <h2 ref={subtitle => this.subtitle = subtitle}>Rename</h2>
       <br />
-      <form onSubmit={(e)=>{e.preventDefault(); console.log('test')}}>
-        <input id="filename"/>
+      <form onSubmit={e => this.submitModal(e)}>
+        <input type="text" id="filename"/>
         {"    "}
         <input type="submit"/>
       </form>
     </Modal>);
+  };
+
+  submitModal = (e) => {
+    e.preventDefault();
+    const text = document.getElementById('filename').value;
+    this.setState({modalIsOpen: false});
+    this.showMenu('');
+
   };
 
   render() {

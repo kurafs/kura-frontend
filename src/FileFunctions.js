@@ -10,8 +10,8 @@ export async function uploadFile(data, path, callback, progress) {
     window.alert('File too big! (4MB max)');
     return;
   }
-  reader.readAsDataURL(data);
-  reader.onprogress = (data) => { progress(data) };
+  reader.readAsArrayBuffer(data);
+  // reader.onprogress = (data) => { progress(data) };
   reader.onloadend = function (evt) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;
@@ -93,4 +93,11 @@ export async function getFile(filepath, callback) {
       }
     }
   });
+}
+
+export async function renameFile(oldPath, newPath, callback) {
+  // const setMetadataRequest = new Metadata.SetMetadataRequest();
+  // const newMetadata = new Metadata.FileMetadata();
+  // newMetadata.set
+  // setMetadataRequest.setKey(oldPath);
 }
