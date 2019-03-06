@@ -27,7 +27,8 @@ class NewApp extends React.Component {
       directory: {},
       root: this.props.match.params['path'] || '',
       favourites: [],
-      sortOrder: 'name',
+      sortCategory: 'name',
+      sortOrder: 1, //1 or -1 == asc or desc
       progress: 0,
       cutFile: '',
       selected: '',
@@ -156,10 +157,10 @@ class NewApp extends React.Component {
       <main role="main" className="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
         <table className="table">
           <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Size</th>
-              <th scope="col">Last Modifed</th>
+            <tr onClick={this.pickSort}>
+              <th id="name" scope="col" className={`${this.state.sortCategory === 'name' ? 'selected': ''}`}>Name</th>
+              <th id="size" scope="col" className={`${this.state.sortCategory === 'size' ? 'selected': ''}`}>Size</th>
+              <th id="lastModified" scope="col" className={`${this.state.sortCategory === 'lastModified' ? 'selected': ''}`}>Last Modified</th>
               <th scope="col"/>
             </tr>
           </thead>
@@ -168,6 +169,15 @@ class NewApp extends React.Component {
           </tbody>
         </table>
       </main>);
+  };
+
+  pickSort = (e) => {
+    if(this.state.sortCategory === e.target.id) {
+      this.setState({sortOrder: -this.state.sortOrder});
+    } else {
+      this.setState({sortCategory:e.target.id});
+      this.setState({sortOrder: 1});
+    }
   };
   files = () => {
     let rootObject = this.state.directory;
@@ -228,7 +238,17 @@ class NewApp extends React.Component {
   };
 
   sortOrder = (structure, key1, key2) => {
-    return key1 >= key2 ? -1: 1;
+    const sort = this.state.sortOrder;
+    switch (this.state.sortCategory) {
+      case 'name':
+        return key1.toLowerCase() >= key2.toLowerCase()  ? sort : -sort;
+      case 'lastModified':
+        return (structure[key1].lastModified || 0) >= (structure[key2].lastModified || 0) ? sort: -sort;
+      case 'size':
+        return (structure[key1].size || 0) >= (structure[key2].size || 0) ? sort: -sort;
+      default:
+        return key1 >= key2 ? sort : -sort;
+    }
   };
 
   handleMenuClick = (e, config) => {
