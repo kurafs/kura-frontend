@@ -23,7 +23,6 @@ export async function encryptFile(data, callback) {
         onEnd: res => {
           const {status, message} = res;
           if (status === grpc.Code.OK && message) {
-            debugger;
             callback(message.toObject());
           }
         }

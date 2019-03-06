@@ -6,7 +6,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './MetadataFunctions';
-import {encryptFile} from './CryptFunctions'
 const customStyles = {
   content : {
     top                   : '50%',
@@ -140,16 +139,15 @@ class NewApp extends React.Component {
   uploadFiles = (files) => {
     let file = files.target.files[0];
     let path = this.state.root === '' ? file.name : `${this.state.root}/${file.name}`;
-    encryptFile(file, ()=>{});
-    // uploadFile(file, path,
-    //   (fileName) => this.updateStructure(fileName, "create"),
-    //   (data) => {
-    //     console.log(data.loaded);
-    //     if(data.lengthComputable) {
-    //       this.setState({progress: data.loaded * 100 / data.total});
-    //     }
-    //   }
-    // );
+    uploadFile(file, path,
+      (fileName) => this.updateStructure(fileName, "create"),
+      (data) => {
+        console.log(data.loaded);
+        if(data.lengthComputable) {
+          this.setState({progress: data.loaded * 100 / data.total});
+        }
+      }
+    );
   };
 
   filetable = () => {

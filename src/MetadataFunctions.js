@@ -1,6 +1,7 @@
 import {grpc} from 'grpc-web-client'
 import {MetadataService} from './proto/metadata_pb_service'
 import Metadata from './proto/metadata_pb'
+import {encryptFile} from './CryptFunctions'
 
 const host = "http://localhost:10670";
 export async function uploadFile(data, path, callback, progress) {
@@ -16,20 +17,23 @@ export async function uploadFile(data, path, callback, progress) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;
       array = new Uint8Array(arrayBuffer);
-      const putRequest = new Metadata.PutFileRequest();
-      putRequest.setFile(array);
-      putRequest.setKey(path);
-      grpc.unary(MetadataService.PutFile, {
-        request: putRequest,
-        host,
-        onEnd: res => {
-          const { status, message} = res;
-          if (status === grpc.Code.OK && message) {
-            callback(path);
-          }
-        }});
-    }
+      // encryptFile(array, (cryptResponse) => {
+      //   const ciphertext = cryptResponse.ciphertext;
 
+        const putRequest = new Metadata.PutFileRequest();
+        putRequest.setFile(array);
+        putRequest.setKey(path);
+        grpc.unary(MetadataService.PutFile, {
+          request: putRequest,
+          host,
+          onEnd: res => {
+            const { status, message} = res;
+            if (status === grpc.Code.OK && message) {
+              callback(path);
+            }
+          }});
+      // });
+    }
   };
 }
 
