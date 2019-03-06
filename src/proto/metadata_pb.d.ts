@@ -211,6 +211,11 @@ export class GetFileResponse extends jspb.Message {
   getFile_asB64(): string;
   setFile(value: Uint8Array | string): void;
 
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): FileMetadata | undefined;
+  setMetadata(value?: FileMetadata): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetFileResponse.AsObject;
   static toObject(includeInstance: boolean, msg: GetFileResponse): GetFileResponse.AsObject;
@@ -224,6 +229,7 @@ export class GetFileResponse extends jspb.Message {
 export namespace GetFileResponse {
   export type AsObject = {
     file: Uint8Array | string,
+    metadata?: FileMetadata.AsObject,
   }
 }
 
@@ -235,6 +241,11 @@ export class PutFileRequest extends jspb.Message {
   getFile_asU8(): Uint8Array;
   getFile_asB64(): string;
   setFile(value: Uint8Array | string): void;
+
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): FileMetadata | undefined;
+  setMetadata(value?: FileMetadata): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PutFileRequest.AsObject;
@@ -250,6 +261,7 @@ export namespace PutFileRequest {
   export type AsObject = {
     key: string,
     file: Uint8Array | string,
+    metadata?: FileMetadata.AsObject,
   }
 }
 

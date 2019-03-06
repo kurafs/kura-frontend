@@ -1522,7 +1522,8 @@ proto.metadata.GetFileResponse.prototype.toObject = function(opt_includeInstance
  */
 proto.metadata.GetFileResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    file: msg.getFile_asB64()
+    file: msg.getFile_asB64(),
+    metadata: (f = msg.getMetadata()) && proto.metadata.FileMetadata.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1563,6 +1564,11 @@ proto.metadata.GetFileResponse.deserializeBinaryFromReader = function(msg, reade
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
       msg.setFile(value);
       break;
+    case 2:
+      var value = new proto.metadata.FileMetadata;
+      reader.readMessage(value,proto.metadata.FileMetadata.deserializeBinaryFromReader);
+      msg.setMetadata(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1597,6 +1603,14 @@ proto.metadata.GetFileResponse.serializeBinaryToWriter = function(message, write
     writer.writeBytes(
       1,
       f
+    );
+  }
+  f = message.getMetadata();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.metadata.FileMetadata.serializeBinaryToWriter
     );
   }
 };
@@ -1638,6 +1652,36 @@ proto.metadata.GetFileResponse.prototype.getFile_asU8 = function() {
 /** @param {!(string|Uint8Array)} value */
 proto.metadata.GetFileResponse.prototype.setFile = function(value) {
   jspb.Message.setProto3BytesField(this, 1, value);
+};
+
+
+/**
+ * optional FileMetadata metadata = 2;
+ * @return {?proto.metadata.FileMetadata}
+ */
+proto.metadata.GetFileResponse.prototype.getMetadata = function() {
+  return /** @type{?proto.metadata.FileMetadata} */ (
+    jspb.Message.getWrapperField(this, proto.metadata.FileMetadata, 2));
+};
+
+
+/** @param {?proto.metadata.FileMetadata|undefined} value */
+proto.metadata.GetFileResponse.prototype.setMetadata = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.metadata.GetFileResponse.prototype.clearMetadata = function() {
+  this.setMetadata(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.metadata.GetFileResponse.prototype.hasMetadata = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -1689,7 +1733,8 @@ proto.metadata.PutFileRequest.prototype.toObject = function(opt_includeInstance)
 proto.metadata.PutFileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     key: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    file: msg.getFile_asB64()
+    file: msg.getFile_asB64(),
+    metadata: (f = msg.getMetadata()) && proto.metadata.FileMetadata.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1734,6 +1779,11 @@ proto.metadata.PutFileRequest.deserializeBinaryFromReader = function(msg, reader
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
       msg.setFile(value);
       break;
+    case 3:
+      var value = new proto.metadata.FileMetadata;
+      reader.readMessage(value,proto.metadata.FileMetadata.deserializeBinaryFromReader);
+      msg.setMetadata(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1775,6 +1825,14 @@ proto.metadata.PutFileRequest.serializeBinaryToWriter = function(message, writer
     writer.writeBytes(
       2,
       f
+    );
+  }
+  f = message.getMetadata();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      proto.metadata.FileMetadata.serializeBinaryToWriter
     );
   }
 };
@@ -1831,6 +1889,36 @@ proto.metadata.PutFileRequest.prototype.getFile_asU8 = function() {
 /** @param {!(string|Uint8Array)} value */
 proto.metadata.PutFileRequest.prototype.setFile = function(value) {
   jspb.Message.setProto3BytesField(this, 2, value);
+};
+
+
+/**
+ * optional FileMetadata metadata = 3;
+ * @return {?proto.metadata.FileMetadata}
+ */
+proto.metadata.PutFileRequest.prototype.getMetadata = function() {
+  return /** @type{?proto.metadata.FileMetadata} */ (
+    jspb.Message.getWrapperField(this, proto.metadata.FileMetadata, 3));
+};
+
+
+/** @param {?proto.metadata.FileMetadata|undefined} value */
+proto.metadata.PutFileRequest.prototype.setMetadata = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+proto.metadata.PutFileRequest.prototype.clearMetadata = function() {
+  this.setMetadata(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.metadata.PutFileRequest.prototype.hasMetadata = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
