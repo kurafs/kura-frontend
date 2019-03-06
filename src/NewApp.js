@@ -143,7 +143,6 @@ class NewApp extends React.Component {
     uploadFile(file, path,
       (fileName) => this.updateStructure(fileName, "create"),
       (data) => {
-        console.log(data.loaded);
         if(data.lengthComputable) {
           this.setState({progress: data.loaded * 100 / data.total});
         }

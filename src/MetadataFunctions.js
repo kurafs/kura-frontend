@@ -20,6 +20,10 @@ export async function uploadFile(data, path, callback, progress) {
       encryptFile(array, (ciphertext) => {
         const putRequest = new Metadata.PutFileRequest();
         const metadata = new Metadata.FileMetadata();
+        const lastModified = new Metadata.FileMetadata.UnixTimestamp();
+        lastModified.setSeconds(Math.round(data.lastModified/1000));
+        metadata.setLastModified(lastModified);
+        metadata.setSize(data.size);
         putRequest.setFile(ciphertext);
         putRequest.setKey(path);
         putRequest.setMetadata(metadata);
@@ -63,9 +67,6 @@ export async function getMetadata(key, callback) {
 
       if (status === grpc.Code.OK && message) {
         let obj = message.toObject();
-        if (!obj.metadata.lastModified) {
-          obj.metadata.lastModified = {seconds: 0};
-        }
         callback(obj);
       }
     }
