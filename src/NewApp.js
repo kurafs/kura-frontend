@@ -95,6 +95,7 @@ class NewApp extends React.Component {
       case "create":
         this.setDirectory(filepath, {lastModified: 0, size: 0});
         getMetadata(filepath, (obj) => {
+
           this.setDirectory(filepath, {
             lastModified: obj.metadata.lastModified.seconds,
             size: obj.metadata.size

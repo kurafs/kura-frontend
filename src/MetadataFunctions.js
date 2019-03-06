@@ -1,7 +1,7 @@
 import {grpc} from 'grpc-web-client'
 import {MetadataService} from './proto/metadata_pb_service'
 import Metadata from './proto/metadata_pb'
-import {encryptFile} from './CryptFunctions'
+import {encryptFile, decryptFile} from './CryptFunctions'
 
 const host = "http://localhost:10670";
 export async function uploadFile(data, path, callback, progress) {
@@ -12,17 +12,17 @@ export async function uploadFile(data, path, callback, progress) {
     return;
   }
   reader.readAsArrayBuffer(data);
-  // reader.onprogress = (data) => { progress(data) };
+  reader.onprogress = (data) => { progress(data) };
   reader.onloadend = function (evt) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;
       array = new Uint8Array(arrayBuffer);
-      // encryptFile(array, (cryptResponse) => {
-      //   const ciphertext = cryptResponse.ciphertext;
-
+      encryptFile(array, (ciphertext) => {
         const putRequest = new Metadata.PutFileRequest();
-        putRequest.setFile(array);
+        const metadata = new Metadata.FileMetadata();
+        putRequest.setFile(ciphertext);
         putRequest.setKey(path);
+        putRequest.setMetadata(metadata);
         grpc.unary(MetadataService.PutFile, {
           request: putRequest,
           host,
@@ -32,7 +32,7 @@ export async function uploadFile(data, path, callback, progress) {
               callback(path);
             }
           }});
-      // });
+      });
     }
   };
 }
@@ -62,7 +62,11 @@ export async function getMetadata(key, callback) {
       const { status, message} = res;
 
       if (status === grpc.Code.OK && message) {
-        callback(message.toObject());
+        let obj = message.toObject();
+        if (!obj.metadata.lastModified) {
+          obj.metadata.lastModified = {seconds: 0};
+        }
+        callback(obj);
       }
     }
   });
@@ -91,9 +95,11 @@ export async function getFile(filepath, callback) {
     host,
     onEnd: res => {
       const { status, message} = res;
-
       if (status === grpc.Code.OK && message) {
-        callback(message.getFile_asU8());
+        let ciphertext = message.getFile_asU8();
+        decryptFile(ciphertext, (plaintext) => {
+          callback(plaintext);
+        });
       }
     }
   });
