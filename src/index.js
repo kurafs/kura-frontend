@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import NewApp from './NewApp';
+import NewApp from './components/Main';
 import { Route, BrowserRouter as Router } from 'react-router-dom'
 import registerServiceWorker from './registerServiceWorker';
 

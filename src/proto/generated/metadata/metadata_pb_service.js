@@ -1,7 +1,7 @@
 // package: metadata
-// file: src/proto/metadata.proto
+// file: src/proto/generated/metadata/metadata.proto
 
-var src_proto_metadata_pb = require("../../src/proto/metadata_pb");
+var src_proto_generated_metadata_metadata_pb = require("../../../../src/proto/generated/metadata/metadata_pb");
 var grpc = require("grpc-web-client").grpc;
 
 var MetadataService = (function () {
@@ -15,8 +15,8 @@ MetadataService.GetFile = {
   service: MetadataService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_metadata_pb.GetFileRequest,
-  responseType: src_proto_metadata_pb.GetFileResponse
+  requestType: src_proto_generated_metadata_metadata_pb.GetFileRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.GetFileResponse
 };
 
 MetadataService.PutFile = {
@@ -24,8 +24,8 @@ MetadataService.PutFile = {
   service: MetadataService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_metadata_pb.PutFileRequest,
-  responseType: src_proto_metadata_pb.PutFileResponse
+  requestType: src_proto_generated_metadata_metadata_pb.PutFileRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.PutFileResponse
 };
 
 MetadataService.DeleteFile = {
@@ -33,8 +33,35 @@ MetadataService.DeleteFile = {
   service: MetadataService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_metadata_pb.DeleteFileRequest,
-  responseType: src_proto_metadata_pb.DeleteFileResponse
+  requestType: src_proto_generated_metadata_metadata_pb.DeleteFileRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.DeleteFileResponse
+};
+
+MetadataService.CreateDirectory = {
+  methodName: "CreateDirectory",
+  service: MetadataService,
+  requestStream: false,
+  responseStream: false,
+  requestType: src_proto_generated_metadata_metadata_pb.CreateDirectoryRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.CreateDirectoryResponse
+};
+
+MetadataService.DeleteDirectory = {
+  methodName: "DeleteDirectory",
+  service: MetadataService,
+  requestStream: false,
+  responseStream: false,
+  requestType: src_proto_generated_metadata_metadata_pb.DeleteDirectoryRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.DeleteDirectoryResponse
+};
+
+MetadataService.GetDirectoryEntries = {
+  methodName: "GetDirectoryEntries",
+  service: MetadataService,
+  requestStream: false,
+  responseStream: false,
+  requestType: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesResponse
 };
 
 MetadataService.GetMetadata = {
@@ -42,8 +69,8 @@ MetadataService.GetMetadata = {
   service: MetadataService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_metadata_pb.GetMetadataRequest,
-  responseType: src_proto_metadata_pb.GetMetadataResponse
+  requestType: src_proto_generated_metadata_metadata_pb.GetMetadataRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.GetMetadataResponse
 };
 
 MetadataService.SetMetadata = {
@@ -51,17 +78,8 @@ MetadataService.SetMetadata = {
   service: MetadataService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_metadata_pb.SetMetadataRequest,
-  responseType: src_proto_metadata_pb.SetMetadataResponse
-};
-
-MetadataService.GetDirectoryKeys = {
-  methodName: "GetDirectoryKeys",
-  service: MetadataService,
-  requestStream: false,
-  responseStream: false,
-  requestType: src_proto_metadata_pb.GetDirectoryKeysRequest,
-  responseType: src_proto_metadata_pb.GetDirectoryKeysResponse
+  requestType: src_proto_generated_metadata_metadata_pb.SetMetadataRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.SetMetadataResponse
 };
 
 exports.MetadataService = MetadataService;
@@ -137,6 +155,72 @@ MetadataServiceClient.prototype.deleteFile = function deleteFile(requestMessage,
   });
 };
 
+MetadataServiceClient.prototype.createDirectory = function createDirectory(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  grpc.unary(MetadataService.CreateDirectory, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          callback(Object.assign(new Error(response.statusMessage), { code: response.status, metadata: response.trailers }), null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+};
+
+MetadataServiceClient.prototype.deleteDirectory = function deleteDirectory(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  grpc.unary(MetadataService.DeleteDirectory, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          callback(Object.assign(new Error(response.statusMessage), { code: response.status, metadata: response.trailers }), null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+};
+
+MetadataServiceClient.prototype.getDirectoryEntries = function getDirectoryEntries(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  grpc.unary(MetadataService.GetDirectoryEntries, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          callback(Object.assign(new Error(response.statusMessage), { code: response.status, metadata: response.trailers }), null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+};
+
 MetadataServiceClient.prototype.getMetadata = function getMetadata(requestMessage, metadata, callback) {
   if (arguments.length === 2) {
     callback = arguments[1];
@@ -164,28 +248,6 @@ MetadataServiceClient.prototype.setMetadata = function setMetadata(requestMessag
     callback = arguments[1];
   }
   grpc.unary(MetadataService.SetMetadata, {
-    request: requestMessage,
-    host: this.serviceHost,
-    metadata: metadata,
-    transport: this.options.transport,
-    debug: this.options.debug,
-    onEnd: function (response) {
-      if (callback) {
-        if (response.status !== grpc.Code.OK) {
-          callback(Object.assign(new Error(response.statusMessage), { code: response.status, metadata: response.trailers }), null);
-        } else {
-          callback(null, response.message);
-        }
-      }
-    }
-  });
-};
-
-MetadataServiceClient.prototype.getDirectoryKeys = function getDirectoryKeys(requestMessage, metadata, callback) {
-  if (arguments.length === 2) {
-    callback = arguments[1];
-  }
-  grpc.unary(MetadataService.GetDirectoryKeys, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,

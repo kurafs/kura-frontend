@@ -1,7 +1,7 @@
 // package: crypt
-// file: src/proto/crypt.proto
+// file: src/proto/generated/crypt/crypt.proto
 
-var src_proto_crypt_pb = require("../../src/proto/crypt_pb");
+var src_proto_generated_crypt_crypt_pb = require("../../../../src/proto/generated/crypt/crypt_pb");
 var grpc = require("grpc-web-client").grpc;
 
 var CryptService = (function () {
@@ -15,8 +15,8 @@ CryptService.Encrypt = {
   service: CryptService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_crypt_pb.EncryptionRequest,
-  responseType: src_proto_crypt_pb.EncryptionResponse
+  requestType: src_proto_generated_crypt_crypt_pb.EncryptionRequest,
+  responseType: src_proto_generated_crypt_crypt_pb.EncryptionResponse
 };
 
 CryptService.Decrypt = {
@@ -24,8 +24,8 @@ CryptService.Decrypt = {
   service: CryptService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_crypt_pb.DecryptionRequest,
-  responseType: src_proto_crypt_pb.DecryptionResponse
+  requestType: src_proto_generated_crypt_crypt_pb.DecryptionRequest,
+  responseType: src_proto_generated_crypt_crypt_pb.DecryptionResponse
 };
 
 CryptService.PublicKey = {
@@ -33,8 +33,8 @@ CryptService.PublicKey = {
   service: CryptService,
   requestStream: false,
   responseStream: false,
-  requestType: src_proto_crypt_pb.PublicKeyRequest,
-  responseType: src_proto_crypt_pb.PublicKeyResponse
+  requestType: src_proto_generated_crypt_crypt_pb.PublicKeyRequest,
+  responseType: src_proto_generated_crypt_crypt_pb.PublicKeyResponse
 };
 
 exports.CryptService = CryptService;

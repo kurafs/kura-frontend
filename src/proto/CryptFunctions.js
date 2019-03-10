@@ -1,6 +1,6 @@
 import {grpc} from 'grpc-web-client'
-import {CryptService} from './proto/crypt_pb_service'
-import Crypt from './proto/crypt_pb'
+import {CryptService} from './generated/crypt/crypt_pb_service'
+import Crypt from './generated/crypt/crypt_pb'
 
 const host = "http://localhost:10870";
 export async function encryptFile(array, callback) {

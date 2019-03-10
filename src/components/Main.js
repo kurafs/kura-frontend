@@ -1,11 +1,11 @@
 import React from 'react';
-import './assets/css/NewApp.css';
-import './assets/css/bootstrap.css';
+import '../assets/css/Main.css';
+import '../assets/css/bootstrap.css';
 import Modal from 'react-modal';
 import _ from 'lodash';
 import moment from 'moment';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata} from './MetadataFunctions';
+import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata, createFolder} from '../proto/MetadataFunctions';
 const customStyles = {
   content : {
     top                   : '50%',
@@ -17,23 +17,25 @@ const customStyles = {
   }
 };
 
-class NewApp extends React.Component {
+class Main extends React.Component {
   constructor(props) {
     super(props);
     getDirectoryKeys(
-      (keysList) => this.setState({directory: this.parseStructure(keysList)})
-      );
+      (keysList) => {this.setState({directory: this.parseStructure(keysList)})}
+    );
     this.state = {
       directory: {},
-      root: this.props.match.params['path'] || '',
+      root: this.props.match.params['path'] || 'kura-root',
       favourites: [],
-      sortCategory: 'name',
-      sortOrder: 1, //1 or -1 == asc or desc
+      sortCategory: 'lastModified',
+      sortOrder: -1, //1 or -1 == asc or desc
       progress: 0,
       cutFile: '',
       selected: '',
       modalIsOpen: false,
-      searchFilter: ''
+      searchFilter: '',
+      modalContent: '', //rename or delete
+      modalSelect: ''
     };
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -64,9 +66,10 @@ class NewApp extends React.Component {
     this.setState({directory: newDirectory});
   };
 
-  parseStructure = (fileList) => {
+  parseStructure = (entriesList) => {
     let struct = {};
-    for(let file of fileList) {
+    for(let entry of entriesList) {
+      const file = entry.path;
       let path = file.split('/');
       let current = struct;
       for (let key of path) {
@@ -80,13 +83,20 @@ class NewApp extends React.Component {
       }
     }
 
-    for(let file of fileList) {
+    for(let entry of entriesList) {
+      const file = entry.path;
       getMetadata(file, (obj) => {
-        this.setDirectory(file, {
+        let lastModified = 0;
+        let size = 0;
+        if (obj.metadata.isDirectory) {
+          this.setDirectory(file, {});
+        } else {
+          this.setDirectory(file, {
               lastModified: obj.metadata.lastModified.seconds,
               size: obj.metadata.size
-          }
-        )
+            }
+          )
+        }
       });
     }
     return struct;
@@ -152,6 +162,7 @@ class NewApp extends React.Component {
     );
   };
 
+  //TODO add arrow for sort
   filetable = () => {
     return (
       <main role="main" className="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
@@ -188,7 +199,11 @@ class NewApp extends React.Component {
     }
     return Object.keys(rootObject)
       .filter(obj => obj!=='favourites')
-      .filter(obj => obj.includes(this.state.searchFilter))
+
+      //search bar
+      .filter(obj => obj.toLowerCase().includes(this.state.searchFilter))
+
+      //column sort
       .sort((key1, key2) => this.sortOrder(rootObject, key1, key2))
       .map(obj => {
         const isFile = rootObject[obj].hasOwnProperty('size');
@@ -254,8 +269,10 @@ class NewApp extends React.Component {
   handleMenuClick = (e, config) => {
     const filePath = this.state.root === '' ? config.file : `${this.state.root}/${config.file}`;
     switch(config.option) {
-      case "Delete":
-        deleteFile(filePath, (file) => this.updateStructure(file, 'delete'));
+      case 'Delete':
+        this.setState({modalContent: 'delete'});
+        this.setState({modalSelect: filePath});
+        this.openModal();
         break;
       case 'Download':
         this.downloadFile(config.file);
@@ -266,16 +283,21 @@ class NewApp extends React.Component {
       case 'Paste':
         this.setState({copiedFile: ''});
         break;
+      case 'New Folder':
+        this.setState({modalContent: 'folder'});
+        this.openModal();
+        break;
       // case 'Rename':
-      //   this.setState({modalIsOpen: true});
+      //   this.setState({modalContent: 'rename'});
+      //   this.openModal();
       //   break;
       default:
         window.alert('not implemented!');
     }
   };
 
-  showMenu = (obj) => {
-    this.setState({selected: obj});
+  showMenu = (name) => {
+    this.setState({selected: name});
   };
 
   menus = () => {
@@ -285,12 +307,12 @@ class NewApp extends React.Component {
         rootObject = rootObject[dir];
       })
     }
-    return Object.keys(rootObject).filter(obj => obj!=='favourites' && rootObject[obj].hasOwnProperty('size')).map(obj => {
-      let options = ["Download", "Delete"];
-      return (<ContextMenu id={obj} key={`${obj}-menu` } onShow={() => this.showMenu(obj)} onHide={() => this.showMenu('')}>
+    return Object.keys(rootObject).filter(name => name!=='favourites' && rootObject[name].hasOwnProperty('size')).map(name => {
+      let options = ["Download", "Delete", "New Folder"];
+      return (<ContextMenu id={name} key={`${name}-menu` } onShow={() => this.showMenu(name)} onHide={() => this.showMenu('')}>
         {options.map((option) => {
           return (
-            <MenuItem key={option} className="dropdown-menu" data={{file: obj, option}} onClick={this.handleMenuClick}>
+            <MenuItem key={option} className="dropdown-menu" data={{file: name, option}} onClick={this.handleMenuClick}>
               {option}
             </MenuItem>
           );
@@ -309,7 +331,7 @@ class NewApp extends React.Component {
               <div>Kura</div>
             </a>
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" onChange={this.onSearchText}/>
-            <button className="navbar-btn" onClick={this.goBack}>Back</button>
+            {this.state.root === 'kura-root' ? null : (<button className="navbar-btn" onClick={this.goBack}>Back</button>)}
             <input type="file" id="files" className="hidden" onChange={(files) => this.uploadFiles(files)}/>
             <label htmlFor="files">Upload</label>
             {/*<div className="test">{this.state.progress}</div>*/}
@@ -320,7 +342,7 @@ class NewApp extends React.Component {
   };
 
   onSearchText = (e) => {
-    this.setState({searchFilter:e.target.value})
+    this.setState({searchFilter:e.target.value.toLowerCase()})
   };
   
   sidebar = () => {
@@ -356,11 +378,13 @@ class NewApp extends React.Component {
   }
 
   afterOpenModal() {
-    const inputBox = document.getElementById('filename');
-    inputBox.value = this.state.selected;
-    inputBox.selectionStart = 0;
-    inputBox.selectionEnd = this.state.selected.indexOf('.');
-    inputBox.focus();
+    if (this.state.modalContent === 'rename') {
+      const inputBox = document.getElementById('filename');
+      inputBox.value = this.state.selected;
+      inputBox.selectionStart = 0;
+      inputBox.selectionEnd = this.state.selected.indexOf('.');
+      inputBox.focus();
+    }
   }
 
   closeModal() {
@@ -373,25 +397,54 @@ class NewApp extends React.Component {
       onAfterOpen={this.afterOpenModal}
       onRequestClose={this.closeModal}
       style={customStyles}
-      contentLabel="Rename Modal"
+      contentLabel="Modal"
     >
-
-      <h2 ref={subtitle => this.subtitle = subtitle}>Rename</h2>
-      <br />
-      <form onSubmit={e => this.submitModal(e)}>
-        <input type="text" id="filename"/>
-        {"    "}
-        <input type="submit"/>
-      </form>
+      {this.modalContent()}
     </Modal>);
+  };
+
+  modalContent = () => {
+    switch(this.state.modalContent) {
+      case 'rename':
+        return (<div>
+          <h2 ref={subtitle => this.subtitle = subtitle}>Rename</h2>
+          <br />
+          <form onSubmit={e => this.submitModal(e)}>
+          <input type="text" id="filename"/>{"    "} <input type="submit"/>
+          </form>
+        </div>);
+      case 'delete':
+        return (<div>
+          <h2 ref={subtitle => this.subtitle = subtitle}>Delete</h2>
+          Are you sure you want to delete this file?
+          <br />
+          <button onClick={() => {
+            deleteFile(this.state.modalSelect, (file) => this.updateStructure(file, 'delete'));
+            this.closeModal();
+          }}>Yes</button>
+          <button onClick={this.closeModal}>No</button>
+        </div>);
+      case 'folder':
+        return (<div>
+          <h2 ref={subtitle => this.subtitle = subtitle}>New Folder</h2>
+          <br />
+          <form onSubmit={e => this.submitModal(e)}>
+            <input type="text" id="filename"/>{"    "} <input type="submit"/>
+          </form>
+        </div>);
+    }
   };
 
   submitModal = (e) => {
     e.preventDefault();
     const text = document.getElementById('filename').value;
     this.setState({modalIsOpen: false});
-    this.showMenu('');
-
+    switch (this.state.modalContent) {
+      case 'folder':
+        const path = `${this.state.root}/${text}`;
+        createFolder(path, () =>{});
+        break;
+    }
   };
 
   render() {
@@ -405,4 +458,4 @@ class NewApp extends React.Component {
   }
 }
 
-export default NewApp;
+export default Main;

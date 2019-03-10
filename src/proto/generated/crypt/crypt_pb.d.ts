@@ -1,5 +1,5 @@
 // package: crypt
-// file: src/proto/crypt.proto
+// file: src/proto/generated/crypt/crypt.proto
 
 import * as jspb from "google-protobuf";
 
