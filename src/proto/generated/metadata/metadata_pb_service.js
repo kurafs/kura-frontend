@@ -19,6 +19,15 @@ MetadataService.GetFile = {
   responseType: src_proto_generated_metadata_metadata_pb.GetFileResponse
 };
 
+MetadataService.GetFileStream = {
+  methodName: "GetFileStream",
+  service: MetadataService,
+  requestStream: false,
+  responseStream: true,
+  requestType: src_proto_generated_metadata_metadata_pb.GetFileStreamRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.GetFileStreamResponse
+};
+
 MetadataService.PutFile = {
   methodName: "PutFile",
   service: MetadataService,
@@ -26,6 +35,15 @@ MetadataService.PutFile = {
   responseStream: false,
   requestType: src_proto_generated_metadata_metadata_pb.PutFileRequest,
   responseType: src_proto_generated_metadata_metadata_pb.PutFileResponse
+};
+
+MetadataService.PutFileStream = {
+  methodName: "PutFileStream",
+  service: MetadataService,
+  requestStream: true,
+  responseStream: false,
+  requestType: src_proto_generated_metadata_metadata_pb.PutFileStreamRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.PutFileStreamResponse
 };
 
 MetadataService.DeleteFile = {
@@ -62,6 +80,15 @@ MetadataService.GetDirectoryEntries = {
   responseStream: false,
   requestType: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesRequest,
   responseType: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesResponse
+};
+
+MetadataService.Rename = {
+  methodName: "Rename",
+  service: MetadataService,
+  requestStream: false,
+  responseStream: false,
+  requestType: src_proto_generated_metadata_metadata_pb.RenameRequest,
+  responseType: src_proto_generated_metadata_metadata_pb.RenameResponse
 };
 
 MetadataService.GetMetadata = {
@@ -111,6 +138,45 @@ MetadataServiceClient.prototype.getFile = function getFile(requestMessage, metad
   });
 };
 
+MetadataServiceClient.prototype.getFileStream = function getFileStream(requestMessage, metadata) {
+  var listeners = {
+    data: [],
+    end: [],
+    status: []
+  };
+  var client = grpc.invoke(MetadataService.GetFileStream, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onMessage: function (responseMessage) {
+      listeners.data.forEach(function (handler) {
+        handler(responseMessage);
+      });
+    },
+    onEnd: function (status, statusMessage, trailers) {
+      listeners.end.forEach(function (handler) {
+        handler();
+      });
+      listeners.status.forEach(function (handler) {
+        handler({ code: status, details: statusMessage, metadata: trailers });
+      });
+      listeners = null;
+    }
+  });
+  return {
+    on: function (type, handler) {
+      listeners[type].push(handler);
+      return this;
+    },
+    cancel: function () {
+      listeners = null;
+      client.close();
+    }
+  };
+};
+
 MetadataServiceClient.prototype.putFile = function putFile(requestMessage, metadata, callback) {
   if (arguments.length === 2) {
     callback = arguments[1];
@@ -132,6 +198,10 @@ MetadataServiceClient.prototype.putFile = function putFile(requestMessage, metad
     }
   });
 };
+
+MetadataService.prototype.putFileStream = function putFileStream() {
+  throw new Error("Bi-directional streaming is not currently supported");
+}
 
 MetadataServiceClient.prototype.deleteFile = function deleteFile(requestMessage, metadata, callback) {
   if (arguments.length === 2) {
@@ -204,6 +274,28 @@ MetadataServiceClient.prototype.getDirectoryEntries = function getDirectoryEntri
     callback = arguments[1];
   }
   grpc.unary(MetadataService.GetDirectoryEntries, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          callback(Object.assign(new Error(response.statusMessage), { code: response.status, metadata: response.trailers }), null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+};
+
+MetadataServiceClient.prototype.rename = function rename(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  grpc.unary(MetadataService.Rename, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,

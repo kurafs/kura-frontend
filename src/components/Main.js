@@ -20,7 +20,7 @@ const customStyles = {
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    getDirectoryKeys(
+    getDirectoryKeys('kura-root',
       (keysList) => {this.setState({directory: this.parseStructure(keysList)})}
     );
     this.state = {
@@ -67,7 +67,7 @@ class Main extends React.Component {
   };
 
   parseStructure = (entriesList) => {
-    let struct = {};
+    let struct = this.state.directory;
     for(let entry of entriesList) {
       const file = entry.path;
       let path = file.split('/');
@@ -83,21 +83,18 @@ class Main extends React.Component {
       }
     }
 
+
     for(let entry of entriesList) {
-      const file = entry.path;
-      getMetadata(file, (obj) => {
-        let lastModified = 0;
-        let size = 0;
-        if (obj.metadata.isDirectory) {
-          this.setDirectory(file, {});
-        } else {
+      if (!entry.isDirectory) {
+        const file = entry.path;
+        getMetadata(file, (obj) => {
           this.setDirectory(file, {
               lastModified: obj.metadata.lastModified.seconds,
               size: obj.metadata.size
             }
           )
-        }
-      });
+        });
+      }
     }
     return struct;
   };
@@ -123,11 +120,15 @@ class Main extends React.Component {
   };
 
   folderClick = (obj) => {
-    if (this.state.root === "") {
-      this.setState({root: obj});
-    } else {
-      this.setState({root: this.state.root + "/" + obj});
-    }
+    const root = `${this.state.root}/${obj}`;
+    this.setState({root});
+
+    getDirectoryKeys(root,
+      (keysList) => {
+      this.setState(
+        {directory: this.parseStructure(keysList)})
+      }
+    );
   };
 
   goBack = () => {

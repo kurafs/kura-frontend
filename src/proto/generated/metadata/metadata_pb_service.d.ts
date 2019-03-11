@@ -13,6 +13,15 @@ type MetadataServiceGetFile = {
   readonly responseType: typeof src_proto_generated_metadata_metadata_pb.GetFileResponse;
 };
 
+type MetadataServiceGetFileStream = {
+  readonly methodName: string;
+  readonly service: typeof MetadataService;
+  readonly requestStream: false;
+  readonly responseStream: true;
+  readonly requestType: typeof src_proto_generated_metadata_metadata_pb.GetFileStreamRequest;
+  readonly responseType: typeof src_proto_generated_metadata_metadata_pb.GetFileStreamResponse;
+};
+
 type MetadataServicePutFile = {
   readonly methodName: string;
   readonly service: typeof MetadataService;
@@ -20,6 +29,15 @@ type MetadataServicePutFile = {
   readonly responseStream: false;
   readonly requestType: typeof src_proto_generated_metadata_metadata_pb.PutFileRequest;
   readonly responseType: typeof src_proto_generated_metadata_metadata_pb.PutFileResponse;
+};
+
+type MetadataServicePutFileStream = {
+  readonly methodName: string;
+  readonly service: typeof MetadataService;
+  readonly requestStream: true;
+  readonly responseStream: false;
+  readonly requestType: typeof src_proto_generated_metadata_metadata_pb.PutFileStreamRequest;
+  readonly responseType: typeof src_proto_generated_metadata_metadata_pb.PutFileStreamResponse;
 };
 
 type MetadataServiceDeleteFile = {
@@ -58,6 +76,15 @@ type MetadataServiceGetDirectoryEntries = {
   readonly responseType: typeof src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesResponse;
 };
 
+type MetadataServiceRename = {
+  readonly methodName: string;
+  readonly service: typeof MetadataService;
+  readonly requestStream: false;
+  readonly responseStream: false;
+  readonly requestType: typeof src_proto_generated_metadata_metadata_pb.RenameRequest;
+  readonly responseType: typeof src_proto_generated_metadata_metadata_pb.RenameResponse;
+};
+
 type MetadataServiceGetMetadata = {
   readonly methodName: string;
   readonly service: typeof MetadataService;
@@ -79,11 +106,14 @@ type MetadataServiceSetMetadata = {
 export class MetadataService {
   static readonly serviceName: string;
   static readonly GetFile: MetadataServiceGetFile;
+  static readonly GetFileStream: MetadataServiceGetFileStream;
   static readonly PutFile: MetadataServicePutFile;
+  static readonly PutFileStream: MetadataServicePutFileStream;
   static readonly DeleteFile: MetadataServiceDeleteFile;
   static readonly CreateDirectory: MetadataServiceCreateDirectory;
   static readonly DeleteDirectory: MetadataServiceDeleteDirectory;
   static readonly GetDirectoryEntries: MetadataServiceGetDirectoryEntries;
+  static readonly Rename: MetadataServiceRename;
   static readonly GetMetadata: MetadataServiceGetMetadata;
   static readonly SetMetadata: MetadataServiceSetMetadata;
 }
@@ -112,6 +142,7 @@ export class MetadataServiceClient {
     requestMessage: src_proto_generated_metadata_metadata_pb.GetFileRequest,
     callback: (error: ServiceError, responseMessage: src_proto_generated_metadata_metadata_pb.GetFileResponse|null) => void
   ): void;
+  getFileStream(requestMessage: src_proto_generated_metadata_metadata_pb.GetFileStreamRequest, metadata?: grpc.Metadata): ResponseStream<src_proto_generated_metadata_metadata_pb.GetFileStreamResponse>;
   putFile(
     requestMessage: src_proto_generated_metadata_metadata_pb.PutFileRequest,
     metadata: grpc.Metadata,
@@ -121,6 +152,7 @@ export class MetadataServiceClient {
     requestMessage: src_proto_generated_metadata_metadata_pb.PutFileRequest,
     callback: (error: ServiceError, responseMessage: src_proto_generated_metadata_metadata_pb.PutFileResponse|null) => void
   ): void;
+  putFileStream(): void;
   deleteFile(
     requestMessage: src_proto_generated_metadata_metadata_pb.DeleteFileRequest,
     metadata: grpc.Metadata,
@@ -156,6 +188,15 @@ export class MetadataServiceClient {
   getDirectoryEntries(
     requestMessage: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesRequest,
     callback: (error: ServiceError, responseMessage: src_proto_generated_metadata_metadata_pb.GetDirectoryEntriesResponse|null) => void
+  ): void;
+  rename(
+    requestMessage: src_proto_generated_metadata_metadata_pb.RenameRequest,
+    metadata: grpc.Metadata,
+    callback: (error: ServiceError, responseMessage: src_proto_generated_metadata_metadata_pb.RenameResponse|null) => void
+  ): void;
+  rename(
+    requestMessage: src_proto_generated_metadata_metadata_pb.RenameRequest,
+    callback: (error: ServiceError, responseMessage: src_proto_generated_metadata_metadata_pb.RenameResponse|null) => void
   ): void;
   getMetadata(
     requestMessage: src_proto_generated_metadata_metadata_pb.GetMetadataRequest,

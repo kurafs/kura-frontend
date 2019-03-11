@@ -41,9 +41,9 @@ export async function uploadFile(data, path, callback, progress) {
   };
 }
 
-export async function getDirectoryKeys(callback) {
+export async function getDirectoryKeys(root, callback) {
   const directoryKeys = new Metadata.GetDirectoryEntriesRequest();
-  directoryKeys.setPath('kura-root');
+  directoryKeys.setPath(root);
   grpc.unary(MetadataService.GetDirectoryEntries, {
     request: directoryKeys,
     host,

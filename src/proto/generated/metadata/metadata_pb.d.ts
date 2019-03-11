@@ -115,6 +115,54 @@ export namespace GetFileResponse {
   }
 }
 
+export class GetFileStreamRequest extends jspb.Message {
+  getPath(): string;
+  setPath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetFileStreamRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetFileStreamRequest): GetFileStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetFileStreamRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetFileStreamRequest;
+  static deserializeBinaryFromReader(message: GetFileStreamRequest, reader: jspb.BinaryReader): GetFileStreamRequest;
+}
+
+export namespace GetFileStreamRequest {
+  export type AsObject = {
+    path: string,
+  }
+}
+
+export class GetFileStreamResponse extends jspb.Message {
+  getChunk(): Uint8Array | string;
+  getChunk_asU8(): Uint8Array;
+  getChunk_asB64(): string;
+  setChunk(value: Uint8Array | string): void;
+
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): Metadata | undefined;
+  setMetadata(value?: Metadata): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetFileStreamResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetFileStreamResponse): GetFileStreamResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetFileStreamResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetFileStreamResponse;
+  static deserializeBinaryFromReader(message: GetFileStreamResponse, reader: jspb.BinaryReader): GetFileStreamResponse;
+}
+
+export namespace GetFileStreamResponse {
+  export type AsObject = {
+    chunk: Uint8Array | string,
+    metadata?: Metadata.AsObject,
+  }
+}
+
 export class PutFileRequest extends jspb.Message {
   getPath(): string;
   setPath(value: string): void;
@@ -159,6 +207,54 @@ export class PutFileResponse extends jspb.Message {
 }
 
 export namespace PutFileResponse {
+  export type AsObject = {
+  }
+}
+
+export class PutFileStreamRequest extends jspb.Message {
+  getPath(): string;
+  setPath(value: string): void;
+
+  getChunk(): Uint8Array | string;
+  getChunk_asU8(): Uint8Array;
+  getChunk_asB64(): string;
+  setChunk(value: Uint8Array | string): void;
+
+  hasMetadata(): boolean;
+  clearMetadata(): void;
+  getMetadata(): Metadata | undefined;
+  setMetadata(value?: Metadata): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PutFileStreamRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PutFileStreamRequest): PutFileStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: PutFileStreamRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PutFileStreamRequest;
+  static deserializeBinaryFromReader(message: PutFileStreamRequest, reader: jspb.BinaryReader): PutFileStreamRequest;
+}
+
+export namespace PutFileStreamRequest {
+  export type AsObject = {
+    path: string,
+    chunk: Uint8Array | string,
+    metadata?: Metadata.AsObject,
+  }
+}
+
+export class PutFileStreamResponse extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PutFileStreamResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: PutFileStreamResponse): PutFileStreamResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: PutFileStreamResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PutFileStreamResponse;
+  static deserializeBinaryFromReader(message: PutFileStreamResponse, reader: jspb.BinaryReader): PutFileStreamResponse;
+}
+
+export namespace PutFileStreamResponse {
   export type AsObject = {
   }
 }
@@ -423,6 +519,46 @@ export class SetMetadataResponse extends jspb.Message {
 }
 
 export namespace SetMetadataResponse {
+  export type AsObject = {
+  }
+}
+
+export class RenameRequest extends jspb.Message {
+  getOldPath(): string;
+  setOldPath(value: string): void;
+
+  getNewPath(): string;
+  setNewPath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RenameRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: RenameRequest): RenameRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: RenameRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RenameRequest;
+  static deserializeBinaryFromReader(message: RenameRequest, reader: jspb.BinaryReader): RenameRequest;
+}
+
+export namespace RenameRequest {
+  export type AsObject = {
+    oldPath: string,
+    newPath: string,
+  }
+}
+
+export class RenameResponse extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RenameResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: RenameResponse): RenameResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: RenameResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RenameResponse;
+  static deserializeBinaryFromReader(message: RenameResponse, reader: jspb.BinaryReader): RenameResponse;
+}
+
+export namespace RenameResponse {
   export type AsObject = {
   }
 }
