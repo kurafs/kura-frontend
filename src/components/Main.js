@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import _ from 'lodash';
 import moment from 'moment';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata, createFolder} from '../proto/MetadataFunctions';
+import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata, createFolder, renameFile} from '../proto/MetadataFunctions';
 const customStyles = {
   content : {
     top                   : '50%',
@@ -54,6 +54,37 @@ class Main extends React.Component {
     this.setState({directory: newDirectory});
   };
 
+  renameKey = (oldPath, newPath) => {
+    let newState = Object.assign({}, this.state.directory);
+
+    let current = newState;
+    let oldPathArr = oldPath.split('/');
+    let newPathArr = newPath.split('/');
+    let oldKey, newKey;
+    let stringIndex = 0;
+    for(let i = 0; i < oldPathArr.length; ++i) {
+      if (oldPathArr[i] !== newPathArr[i]) {
+        oldKey = oldPathArr[i];
+        newKey = newPathArr[i];
+        break;
+      }
+      current = current[oldPathArr[i]];
+      stringIndex += oldPathArr[i].length + 1;
+    }
+    const modifiedKey = Object.assign({}, current);
+    if(typeof current[oldKey] === 'string') {
+      modifiedKey[newKey] = current[oldKey];
+    } else {
+      modifiedKey[newKey] = Object.assign({}, current[oldKey]);
+    }
+    delete modifiedKey[oldKey];
+
+    let modifyPath = oldPath.substring(0, stringIndex - 1).replace(/\//g,'.');
+
+    _.set(newState, modifyPath, modifiedKey);
+    this.setState({directory: newState});
+  };
+
   unsetDirectory = (filepath) => {
     let newDirectory = Object.assign({}, this.state.directory);
     let filename = _.last(filepath.split('/'));
@@ -99,7 +130,7 @@ class Main extends React.Component {
     return struct;
   };
 
-  updateStructure = (filepath, option) => {
+  updateStructure = (filepath, option, params) => {
     switch(option) {
       case "create":
         this.setDirectory(filepath, {lastModified: 0, size: 0});
@@ -113,6 +144,12 @@ class Main extends React.Component {
         break;
       case "delete":
         this.unsetDirectory(filepath);
+        break;
+      case "folder":
+        this.setDirectory(filepath, {});
+        break;
+      case "rename":
+        this.renameKey(filepath, params.newPath);
         break;
       default:
         // do nothing
@@ -269,10 +306,10 @@ class Main extends React.Component {
 
   handleMenuClick = (e, config) => {
     const filePath = this.state.root === '' ? config.file : `${this.state.root}/${config.file}`;
+    this.setState({modalSelect: filePath});
     switch(config.option) {
       case 'Delete':
         this.setState({modalContent: 'delete'});
-        this.setState({modalSelect: filePath});
         this.openModal();
         break;
       case 'Download':
@@ -288,10 +325,10 @@ class Main extends React.Component {
         this.setState({modalContent: 'folder'});
         this.openModal();
         break;
-      // case 'Rename':
-      //   this.setState({modalContent: 'rename'});
-      //   this.openModal();
-      //   break;
+      case 'Rename':
+        this.setState({modalContent: 'rename'});
+        this.openModal();
+        break;
       default:
         window.alert('not implemented!');
     }
@@ -309,7 +346,7 @@ class Main extends React.Component {
       })
     }
     return Object.keys(rootObject).filter(name => name!=='favourites' && rootObject[name].hasOwnProperty('size')).map(name => {
-      let options = ["Download", "Delete", "New Folder"];
+      let options = ["Download", "Delete", "Rename", "New Folder"];
       return (<ContextMenu id={name} key={`${name}-menu` } onShow={() => this.showMenu(name)} onHide={() => this.showMenu('')}>
         {options.map((option) => {
           return (
@@ -381,9 +418,12 @@ class Main extends React.Component {
   afterOpenModal() {
     if (this.state.modalContent === 'rename') {
       const inputBox = document.getElementById('filename');
-      inputBox.value = this.state.selected;
-      inputBox.selectionStart = 0;
-      inputBox.selectionEnd = this.state.selected.indexOf('.');
+      inputBox.value = this.state.modalSelect;
+      inputBox.selectionStart = this.state.modalSelect.lastIndexOf('/') + 1;
+      inputBox.selectionEnd = this.state.modalSelect.indexOf('.');
+      inputBox.focus();
+    } else if((this.state.modalContent === 'folder')) {
+      const inputBox = document.getElementById('filename');
       inputBox.focus();
     }
   }
@@ -443,8 +483,12 @@ class Main extends React.Component {
     switch (this.state.modalContent) {
       case 'folder':
         const path = `${this.state.root}/${text}`;
-        createFolder(path, () =>{});
+        createFolder(path, () =>{
+          this.updateStructure(path, 'folder');
+        });
         break;
+      case 'rename':
+        renameFile(this.state.modalSelect, text, (obj)=>{this.updateStructure(this.state.modalSelect, 'rename', {newPath: text})});
     }
   };
 

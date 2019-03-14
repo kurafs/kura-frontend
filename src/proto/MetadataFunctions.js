@@ -128,3 +128,20 @@ export async function createFolder(path, callback) {
     }
   });
 }
+
+export async function renameFile(oldPath, newPath, callback) {
+  const renameRequest = new Metadata.RenameRequest();
+  renameRequest.setOldPath(oldPath);
+  renameRequest.setNewPath(newPath);
+  grpc.unary(MetadataService.Rename, {
+    request: renameRequest,
+    host,
+    onEnd: res => {
+      const { status, message} = res;
+      if (status === grpc.Code.OK && message) {
+        callback(message.toObject());
+      }
+    }
+  });
+}
+
