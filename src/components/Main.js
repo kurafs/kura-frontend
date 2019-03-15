@@ -240,6 +240,9 @@ class Main extends React.Component {
       //search bar
       .filter(obj => obj.toLowerCase().includes(this.state.searchFilter))
 
+      //files that start with .
+      .filter(obj => !obj.startsWith('.'))
+
       //column sort
       .sort((key1, key2) => this.sortOrder(rootObject, key1, key2))
       .map(obj => {

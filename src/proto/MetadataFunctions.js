@@ -3,8 +3,8 @@ import {MetadataService} from './generated/metadata/metadata_pb_service'
 import Metadata from './generated/metadata/metadata_pb'
 import {encryptFile, decryptFile} from './CryptFunctions'
 
-const host = "http://localhost:10670";
-// const host = "http://159.203.54.254:10670";
+// const host = "http://localhost:10670";
+const host = "http://159.203.54.254:10670";
 export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;
