@@ -3,8 +3,8 @@ import {MetadataService} from './generated/metadata/metadata_pb_service'
 import Metadata from './generated/metadata/metadata_pb'
 import {encryptFile, decryptFile} from './CryptFunctions'
 
-// const host = "http://localhost:10670";
-const host = "http://159.203.54.254:10670";
+const host = "http://localhost:10670";
+// const host = "http://159.203.54.254:10670";
 export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;
@@ -96,6 +96,22 @@ export async function deleteFile(filepath, callback) {
     }
   });
 }
+
+export async function deleteFolder(filepath, callback) {
+  const deleteFolderRequest = new Metadata.DeleteDirectoryRequest();
+  deleteFolderRequest.setPath(filepath);
+  grpc.unary(MetadataService.DeleteDirectory, {
+    request: deleteFolderRequest,
+    host,
+    onEnd: res => {
+      const { status, message} = res;
+      if (status === grpc.Code.OK && message) {
+        callback(filepath);
+      }
+    }
+  });
+}
+
 
 export async function getFile(filepath, callback) {
   const getFileRequest = new Metadata.GetFileRequest();

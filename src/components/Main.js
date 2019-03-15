@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import _ from 'lodash';
 import moment from 'moment';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import {uploadFile, getDirectoryKeys, deleteFile, getFile, getMetadata, createFolder, renameFile} from '../proto/MetadataFunctions';
+import {uploadFile, getDirectoryKeys, deleteFile, deleteFolder, getFile, getMetadata, createFolder, renameFile} from '../proto/MetadataFunctions';
 const customStyles = {
   content : {
     top                   : '50%',
@@ -35,7 +35,8 @@ class Main extends React.Component {
       modalIsOpen: false,
       searchFilter: '',
       modalContent: '', //rename or delete
-      modalSelect: ''
+      modalSelect: '',
+      fileSelected: true
     };
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -56,7 +57,6 @@ class Main extends React.Component {
 
   renameKey = (oldPath, newPath) => {
     let newState = Object.assign({}, this.state.directory);
-
     let current = newState;
     let oldPathArr = oldPath.split('/');
     let newPathArr = newPath.split('/');
@@ -80,7 +80,6 @@ class Main extends React.Component {
     delete modifiedKey[oldKey];
 
     let modifyPath = oldPath.substring(0, stringIndex - 1).replace(/\//g,'.');
-
     _.set(newState, modifyPath, modifiedKey);
     this.setState({directory: newState});
   };
@@ -307,6 +306,7 @@ class Main extends React.Component {
   handleMenuClick = (e, config) => {
     const filePath = this.state.root === '' ? config.file : `${this.state.root}/${config.file}`;
     this.setState({modalSelect: filePath});
+    this.setState({fileSelected: config.isFile});
     switch(config.option) {
       case 'Delete':
         this.setState({modalContent: 'delete'});
@@ -345,12 +345,15 @@ class Main extends React.Component {
         rootObject = rootObject[dir];
       })
     }
-    return Object.keys(rootObject).filter(name => name!=='favourites' && rootObject[name].hasOwnProperty('size')).map(name => {
-      let options = ["Download", "Delete", "Rename", "New Folder"];
+    const fileOptions = ["Download", "Delete", "Rename", "New Folder"];
+    const folderOptions = ["Delete", "Rename", "New Folder"];
+    return Object.keys(rootObject).filter(name => name!=='favourites').map(name => {
+      const isFile = rootObject[name].hasOwnProperty('size');
+      let options = isFile ? fileOptions : folderOptions;
       return (<ContextMenu id={name} key={`${name}-menu` } onShow={() => this.showMenu(name)} onHide={() => this.showMenu('')}>
         {options.map((option) => {
           return (
-            <MenuItem key={option} className="dropdown-menu" data={{file: name, option}} onClick={this.handleMenuClick}>
+            <MenuItem key={option} className="dropdown-menu" data={{file: name, option, isFile }} onClick={this.handleMenuClick}>
               {option}
             </MenuItem>
           );
@@ -457,12 +460,9 @@ class Main extends React.Component {
       case 'delete':
         return (<div>
           <h2 ref={subtitle => this.subtitle = subtitle}>Delete</h2>
-          Are you sure you want to delete this file?
+          {`Are you sure you want to delete this ${this.state.fileSelected ? 'file' : 'folder'}?`}
           <br />
-          <button onClick={() => {
-            deleteFile(this.state.modalSelect, (file) => this.updateStructure(file, 'delete'));
-            this.closeModal();
-          }}>Yes</button>
+          <button onClick={this.submitModal}>Yes</button>
           <button onClick={this.closeModal}>No</button>
         </div>);
       case 'folder':
@@ -478,7 +478,11 @@ class Main extends React.Component {
 
   submitModal = (e) => {
     e.preventDefault();
-    const text = document.getElementById('filename').value;
+    const textBox = document.getElementById('filename');
+    let text;
+    if (textBox) {
+      text = textBox.value;
+    }
     this.setState({modalIsOpen: false});
     switch (this.state.modalContent) {
       case 'folder':
@@ -489,6 +493,14 @@ class Main extends React.Component {
         break;
       case 'rename':
         renameFile(this.state.modalSelect, text, (obj)=>{this.updateStructure(this.state.modalSelect, 'rename', {newPath: text})});
+        break;
+      case 'delete':
+        if (this.state.fileSelected) {
+          deleteFile(this.state.modalSelect, (file) => this.updateStructure(file, 'delete'));
+        } else {
+          deleteFolder(this.state.modalSelect, (file) => this.updateStructure(file, 'delete'));
+        }
+        break;
     }
   };
 
