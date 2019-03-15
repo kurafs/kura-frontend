@@ -121,6 +121,27 @@ export async function getFile(filepath, callback) {
     host,
     onEnd: res => {
       const { status, message} = res;
+      if (status === 8) {
+        alert('File too big! (4MB max)')
+      }
+      if (status === grpc.Code.OK && message) {
+        let ciphertext = message.getFile_asU8();
+        decryptFile(ciphertext, message.getMetadata(), (plaintext) => {
+          callback(plaintext);
+        });
+      }
+    }
+  });
+}
+
+export async function stream(filepath, callback) {
+  const getFileRequest = new Metadata.GetFileRequest();
+  getFileRequest.setPath(filepath);
+  grpc.unary(MetadataService.GetFile, {
+    request: getFileRequest,
+    host,
+    onEnd: res => {
+      const { status, message} = res;
       if (status === grpc.Code.OK && message) {
         let ciphertext = message.getFile_asU8();
         decryptFile(ciphertext, message.getMetadata(), (plaintext) => {
