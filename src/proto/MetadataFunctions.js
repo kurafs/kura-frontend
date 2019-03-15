@@ -3,7 +3,8 @@ import {MetadataService} from './generated/metadata/metadata_pb_service'
 import Metadata from './generated/metadata/metadata_pb'
 import {encryptFile, decryptFile} from './CryptFunctions'
 
-const host = "http://localhost:10670";
+// const host = "http://localhost:10670";
+const host = "http://159.203.54.254:10670";
 export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;
@@ -17,13 +18,20 @@ export async function uploadFile(data, path, callback, progress) {
     if (evt.target.readyState === FileReader.DONE) {
       let arrayBuffer = evt.target.result;
       array = new Uint8Array(arrayBuffer);
-      encryptFile(array, (ciphertext) => {
+      encryptFile(array, (ciphertext, hashedPubKey, encryptedAesKey) => {
         const putRequest = new Metadata.PutFileRequest();
         const metadata = new Metadata.Metadata();
         const lastModified = new Metadata.Metadata.UnixTimestamp();
+        const created = new Metadata.Metadata.UnixTimestamp();
+        const accessor = new Metadata.Metadata.Accessor();
+        accessor.setEncryptedKey(encryptedAesKey);
+        accessor.setIdentityHash(hashedPubKey);
         lastModified.setSeconds(Math.floor(data.lastModified/1000));
+        created.setSeconds(Math.floor(data.lastModified/1000));
         metadata.setLastModified(lastModified);
+        metadata.setCreated(created);
         metadata.setSize(data.size);
+        metadata.setAccessListList([accessor]);
         putRequest.setFile(ciphertext);
         putRequest.setPath(path);
         putRequest.setMetadata(metadata);
@@ -99,7 +107,7 @@ export async function getFile(filepath, callback) {
       const { status, message} = res;
       if (status === grpc.Code.OK && message) {
         let ciphertext = message.getFile_asU8();
-        decryptFile(ciphertext, (plaintext) => {
+        decryptFile(ciphertext, message.getMetadata(), (plaintext) => {
           callback(plaintext);
         });
       }
@@ -111,10 +119,12 @@ export async function createFolder(path, callback) {
   const createDirectoryRequest = new Metadata.CreateDirectoryRequest();
   const metadata = new Metadata.Metadata();
   const creation = new Metadata.Metadata.UnixTimestamp();
+  const lastModified = new Metadata.Metadata.UnixTimestamp();
   creation.setSeconds(Math.floor(Date.now()/1000));
-
+  lastModified.setSeconds(Math.floor(Date.now()/1000));
   metadata.setIsDirectory(true);
   metadata.setCreated(creation);
+  metadata.setLastModified(lastModified);
   createDirectoryRequest.setPath(path);
   createDirectoryRequest.setMetadata(metadata);
   grpc.unary(MetadataService.CreateDirectory, {

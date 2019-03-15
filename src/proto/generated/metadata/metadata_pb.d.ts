@@ -23,6 +23,11 @@ export class Metadata extends jspb.Message {
   getIsDirectory(): boolean;
   setIsDirectory(value: boolean): void;
 
+  clearAccessListList(): void;
+  getAccessListList(): Array<Metadata.Accessor>;
+  setAccessListList(value: Array<Metadata.Accessor>): void;
+  addAccessList(value?: Metadata.Accessor, index?: number): Metadata.Accessor;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Metadata.AsObject;
   static toObject(includeInstance: boolean, msg: Metadata): Metadata.AsObject;
@@ -40,6 +45,7 @@ export namespace Metadata {
     permissions: number,
     size: number,
     isDirectory: boolean,
+    accessListList: Array<Metadata.Accessor.AsObject>,
   }
 
   export class UnixTimestamp extends jspb.Message {
@@ -63,6 +69,34 @@ export namespace Metadata {
     export type AsObject = {
       seconds: number,
       nanoseconds: number,
+    }
+  }
+
+  export class Accessor extends jspb.Message {
+    getIdentityHash(): Uint8Array | string;
+    getIdentityHash_asU8(): Uint8Array;
+    getIdentityHash_asB64(): string;
+    setIdentityHash(value: Uint8Array | string): void;
+
+    getEncryptedKey(): Uint8Array | string;
+    getEncryptedKey_asU8(): Uint8Array;
+    getEncryptedKey_asB64(): string;
+    setEncryptedKey(value: Uint8Array | string): void;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): Accessor.AsObject;
+    static toObject(includeInstance: boolean, msg: Accessor): Accessor.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: Accessor, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Accessor;
+    static deserializeBinaryFromReader(message: Accessor, reader: jspb.BinaryReader): Accessor;
+  }
+
+  export namespace Accessor {
+    export type AsObject = {
+      identityHash: Uint8Array | string,
+      encryptedKey: Uint8Array | string,
     }
   }
 }
