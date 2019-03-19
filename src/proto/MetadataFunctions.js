@@ -4,7 +4,8 @@ import Metadata from './generated/metadata/metadata_pb'
 import {encryptFile, decryptFile} from './CryptFunctions'
 
 // const host = "http://localhost:10670";
-const host = "http://159.203.54.254:10670";
+// const host = "http://10.33.143.179:10670"; // FRANZ
+const host = "http://10.35.135.225:10670"; // ARHAM
 export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;
@@ -31,6 +32,7 @@ export async function uploadFile(data, path, callback, progress) {
         metadata.setLastModified(lastModified);
         metadata.setCreated(created);
         metadata.setSize(data.size);
+        metadata.setPermissions(420);
         metadata.setAccessListList([accessor]);
         putRequest.setFile(ciphertext);
         putRequest.setPath(path);
@@ -126,6 +128,9 @@ export async function getFile(filepath, callback) {
       }
       if (status === grpc.Code.OK && message) {
         let ciphertext = message.getFile_asU8();
+        if (ciphertext.length === 0) {
+          alert('Cannot download empty files!');
+        }
         decryptFile(ciphertext, message.getMetadata(), (plaintext) => {
           callback(plaintext);
         });
