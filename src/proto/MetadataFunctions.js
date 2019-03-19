@@ -3,9 +3,9 @@ import {MetadataService} from './generated/metadata/metadata_pb_service'
 import Metadata from './generated/metadata/metadata_pb'
 import {encryptFile, decryptFile} from './CryptFunctions'
 
-// const host = "http://localhost:10670";
+const host = window.localStorage.getItem("metadata") || "http://10.35.135.225:10670";
 // const host = "http://10.33.143.179:10670"; // FRANZ
-const host = "http://10.35.135.225:10670"; // ARHAM
+// const host = "http://10.35.135.225:10670"; // ARHAM
 export async function uploadFile(data, path, callback, progress) {
   let reader = new FileReader();
   let array;

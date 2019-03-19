@@ -1,8 +1,24 @@
+@font-face {
+  font-family: 'Product Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
+}
+
+body {
+  background: rgb(251, 251, 251) !important;
+  font-family: "Product Sans" !important;
+}
+
 .home {
   display: flex;
   :hover {
     cursor: pointer;
   }
+}
+
+.navbar-inverse {
+  background-color: rgb(51, 51, 51) !important;
 }
 
 .topbar {
@@ -16,13 +32,6 @@
 
 .form-control {
   margin-top: 8px;
-}
-
-.topbar button {
-  margin-top: 12px;
-  margin-left: 10px;
-  padding-right: 10px;
-  border-radius: 5px;
 }
 
 td {
@@ -41,11 +50,12 @@ td {
 label {
   background: white;
   font-weight: normal !important;
-  margin-top: 13px;
-  width: 109px;
-  height: 28px;
+  margin-top: 8px;
+  width: 60px;
+  height: 34px;
   margin-left: 12px;
-  padding: 5px;
+  padding: 8px 5px 5px;
+  text-align: center;
   border-radius: 5px;
   box-shadow: 0 0 0 1px hsl(0, 0%, 80%);
   &:hover {
@@ -53,36 +63,86 @@ label {
   }
 }
 
+button {
+  background: white;
+  font-weight: normal !important;
+  margin-top: 8px;
+  width: 62px;
+  height: 35px;
+  margin-left: 10px !important;
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  //box-shadow: 0 0 0 1px hsl(0, 0%, 80%);
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .react-contextmenu--visible {
-  background: whitesmoke;
-  border: 1px solid gray;
+  background: white;
+  border: 1px solid black;
   border-radius: 4px;
-  padding: 5px 0;
+  //padding: 5px 8px;
 }
 
 .react-contextmenu-item {
-  padding: 5px 5px;
+  padding: 5px 35px 5px 10px;
 }
 
 .react-contextmenu-item--selected {
-  background: #d6d6d6;
+  background: #f3f3f359;
 }
 
 .folder:hover {
-  background: #d3d3d359;
+  background: #f3f3f359;
+  cursor: pointer;
 }
 
 .selected {
-  background: #d3d3d359;
+  background: #f3f3f359;
 }
 
 table {
-  margin-top: 50px;
   border-bottom: solid #DDDDDD 1px;
+}
+
+main {
+  margin-left: 100px;
+  margin-top: 80px;
+  border-radius: 10px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  background: white;
 }
 
 img {
   height: 100%;
   margin-right: 10px;
   margin-bottom: 10px;
+}
+
+nav {
+  .container {
+    margin-left: 100px;
+  }
+}
+
+.topbar {
+  input {
+    width: 43vw;
+  }
+}
+
+.kura {
+  margin-right:3vw;
+  color: white;
+}
+
+.name {
+  width: 40vw;
+}
+
+.size {
+  width: 10vw;
 }

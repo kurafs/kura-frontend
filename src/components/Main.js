@@ -206,10 +206,9 @@ class Main extends React.Component {
         <table className="table">
           <thead>
             <tr onClick={this.pickSort}>
-              <th id="name" scope="col" className={`${this.state.sortCategory === 'name' ? 'selected': ''}`}>Name</th>
-              <th id="size" scope="col" className={`${this.state.sortCategory === 'size' ? 'selected': ''}`}>Size</th>
-              <th id="lastModified" scope="col" className={`${this.state.sortCategory === 'lastModified' ? 'selected': ''}`}>Last Modified</th>
-              <th scope="col"/>
+              <th id="name" scope="col" className="name">Name</th>
+              <th id="size" scope="col" className="size">Size</th>
+              <th id="lastModified" scope="col" className="lastModified">Last Modified</th>
             </tr>
           </thead>
           <tbody>
@@ -255,7 +254,7 @@ class Main extends React.Component {
           id={obj}>
           <td>
             <ContextMenuTrigger id={obj}>
-              {obj}
+              {`${obj}${isFile ? '' : '/'}`}
             </ContextMenuTrigger>
           </td>
           <td>
@@ -371,8 +370,7 @@ class Main extends React.Component {
         <div className="container">
           <div className="navbar-header topbar" href="#">
             <a className="navbar-brand home">
-              <img src="/favicon.ico" alt="Kura"/>
-              <div>Kura</div>
+              <div className="kura">Kura</div>
             </a>
             <input className="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search" onChange={this.onSearchText}/>
             {this.state.root === 'kura-root' ? null : (<button className="navbar-btn" onClick={this.goBack}>Back</button>)}
