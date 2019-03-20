@@ -20,9 +20,6 @@ const customStyles = {
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    getDirectoryKeys('kura-root',
-      (keysList) => {this.setState({directory: this.parseStructure(keysList)})}
-    );
     this.state = {
       directory: {},
       root: this.props.match.params['path'] || 'kura-root',
@@ -42,6 +39,21 @@ class Main extends React.Component {
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
+
+  componentDidMount() {
+    this.poll();
+  }
+
+  poll = () => {
+    getDirectoryKeys(this.state.root,
+      (keysList) => {
+        this.setState(
+          {directory: this.parseStructure(keysList)})
+      }
+    );
+
+    setTimeout(this.poll, 1000);
+  };
 
   setDirectory = (filepath, obj) => {
     let newDirectory = Object.assign({}, this.state.directory);
