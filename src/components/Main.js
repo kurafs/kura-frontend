@@ -109,7 +109,7 @@ class Main extends React.Component {
   };
 
   parseStructure = (entriesList) => {
-    let struct = this.state.directory;
+    let struct = Object.assign({}, this.state.directory);
     for(let entry of entriesList) {
       const file = entry.path;
       let path = file.split('/');
@@ -136,6 +136,20 @@ class Main extends React.Component {
             }
           )
         });
+      }
+    }
+
+    // delete extra keys no longer there
+    let rootPath = this.state.root.split('/');
+    let current = struct;
+    for(let key of rootPath) {
+      current = current[key];
+    }
+    const topKeys = Object.keys(current);
+    let entries = entriesList.map((entry) => {return entry.path});
+    for (let key of topKeys) {
+      if (!entries.includes(`${this.state.root}/${key}`)) {
+        delete current[key];
       }
     }
     return struct;
