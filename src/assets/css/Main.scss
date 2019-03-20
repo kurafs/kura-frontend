@@ -88,10 +88,13 @@ button {
 
 .react-contextmenu-item {
   padding: 5px 35px 5px 10px;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .react-contextmenu-item--selected {
-  background: #f3f3f359;
+  background: #f3f3f3;
 }
 
 .folder:hover {
